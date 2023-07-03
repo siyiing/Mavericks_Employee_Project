@@ -1,0 +1,11 @@
+.header {
+    background-color: #00446d;
+    display: flex;
+}
+
+.title {
+    font-weight: bold;
+    font-size: 1rem;
+    color: #ffffff;
+    border: 1px solid red;
+}
