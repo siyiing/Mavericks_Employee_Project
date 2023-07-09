@@ -5,49 +5,77 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import "./EmployeeList.css";
-import { useAppSelector } from "../store/store";
-// import { handleClickOpen } from "DeleteDialog.tsx";
+import { useAppSelector } from "../store/hook";
+import { Grid } from "@mui/material";
+import Item from "@mui/material/Grid";
+import { fetchAllEmployeesThunk } from "../store/features/employeeThunk";
+import { useAppDispatch } from "../store/hook";
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
 
 const EmployeeList = () => {
+  const dispatch = useAppDispatch();
+  // const employee = useAppSelector(employeeState);
   const employees = useAppSelector((state) => state.employee.employees);
 
+  useEffect(() => {
+    fetchEmployee();
+  }, []);
+
+  const fetchEmployee = async () => {
+    try {
+      await dispatch(fetchAllEmployeesThunk()).unwrap(); // unwrap helps to tell me which status it is 
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
-    <div className="card">
-      {employees.map((employee) => (
-        <Card sx={{ display: "flex", maxWidth: 200, maxHeight: 150 }}>
-          <Box sx={{ display: "flex", flexDirection: "column" }}>
-            <CardContent>
-              <Typography gutterBottom variant="h5" component="div">
-                {employee.id}
-                {employee.name}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {employee.department}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                ${employee.salary}
-              </Typography>
-            </CardContent>
-          </Box>
-          <CardActions>
-            <ModeEditIcon
-              key={employee.id}
-              style={{ color: "orange" }}
-              onClick={() => {
-                alert(employee.id + "edit clicked");
-              }}
-            />
-            <DeleteIcon
-              key={employee.id}
-              style={{ color: "red" }}
-              onClick={() => {
-                // handleClickOpen
-              }}
-            />
-          </CardActions>
-        </Card>
-      ))}
+    <div className="emp_list">
+      <Grid container spacing="30" sx={{ width: "60%" }}>
+        {employees.map((emp) => (
+          <Grid
+            item
+            key={emp.id}
+            xs={12}
+            md={6}
+            sx={{ display: "flex", justifyContent: "center" }}
+          >
+            <Item>
+              <Card sx={{ width: 300, height: 180, border: "1px solid red" }}>
+                <Box>
+                  <CardContent>
+                    <Typography gutterBottom variant="h5" component="div">
+                      {emp.id}
+                      {emp.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {emp.department}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      ${emp.salary}
+                    </Typography>
+                  </CardContent>
+                </Box>
+                <CardActions>
+                  <Link to="/editemployee">
+                    <ModeEditIcon
+                      style={{ color: "orange" }}  
+                    />
+                  </Link>
+
+                  <DeleteIcon
+                    style={{ color: "red" }}
+                    onClick={() => {
+                      alert(emp.id + "delete clicked");
+                    }}
+                  />
+                </CardActions>
+              </Card>
+            </Item>
+          </Grid>
+        ))}
+      </Grid>
     </div>
   );
 };

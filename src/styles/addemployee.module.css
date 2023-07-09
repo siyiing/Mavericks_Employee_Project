@@ -1,0 +1,11 @@
+.main_grid {
+    border: 1px solid red;
+    margin: auto;   
+    width: 100vw;
+}
+
+.addTitle {
+     font-weight: bold;
+     font-size: 3rem;
+     text-align: center;
+}

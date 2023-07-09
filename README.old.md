@@ -5,6 +5,8 @@
 - `npm i react-redux @reactjs/toolkit`
 - `npm redux-thunk @types/redux-thunk`
 - `npm install @mui/icons-material @mui/material @emotion/styled @emotion/react`
+- `npm i axois` 
+- `npm i react-router-dom` 
 
 # To Do
 

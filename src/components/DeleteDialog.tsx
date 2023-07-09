@@ -1,24 +1,5 @@
-import { useState } from "react";
-
 const DeleteDialog = () => {
-
-  const [deleteAlertOpen, setDeleteAlertVisibility] = useState(false);
-
-  const handleClickOpen = () => {
-    setDeleteAlertVisibility(true);
-  }
-
-  const handleClickClose = () => {
-    setDeleteAlertVisibility(false);
-  }
-
-
-
-  return (
-    <div>
-     
-    </div>
-  );
+  return <div>Delete</div>;
 };
 
 export default DeleteDialog;

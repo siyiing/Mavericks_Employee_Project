@@ -1,14 +1,12 @@
-import "./App.css";
-import Header from "./components/Header";
-import EmployeeList from "./components/EmployeeList";
-import TempAddEmployee from "./components/TempAddEmployee";
+import Home from "./pages/Home";
+import { CssBaseline } from "@mui/material";
 
 function App() {
+  
   return (
     <div className="App">
-      <Header />
-      <TempAddEmployee />
-      <EmployeeList />
+      <CssBaseline />
+      <Home />
     </div>
   );
 }
