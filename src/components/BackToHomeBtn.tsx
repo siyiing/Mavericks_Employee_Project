@@ -1,20 +1,21 @@
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { Button } from "@mui/material";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const BackToHomeBtn = () => {
+  const navigate = useNavigate();
+
   return (
     <div>
-      <Link to="/">
-        <Button
-          variant="contained"
-          color="success"
-          size="medium"
-          startIcon={<ArrowBackIosIcon />}
-        >
-          Back Home
-        </Button>
-      </Link>
+      <Button
+        variant="contained"
+        color="success"
+        size="medium"
+        startIcon={<ArrowBackIosIcon />}
+        onClick={() => navigate("/")}
+      >
+        Back Home
+      </Button>
     </div>
   );
 };

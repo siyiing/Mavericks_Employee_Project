@@ -1,10 +1,11 @@
-import { useLocation } from "react-router-dom";
-import AddEmployee from "./AddEmployeeBtn";
+import { useLocation, useNavigate } from "react-router-dom";
+import AddEmployeeBtn from "./AddEmployeeBtn";
 import BackToHomeBtn from "./BackToHomeBtn";
 import { Box, AppBar, Toolbar, Typography } from "@mui/material";
 
 const Header = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   return (
     <>
@@ -18,14 +19,16 @@ const Header = () => {
                 fontSize: "1.5rem",
                 color: "#ffffff",
               }}
+              onClick={() => navigate("/")}
             >
               Employees
             </Typography>
 
-            {location.pathname === "/addemployee" ? (
+            {location.pathname === "/addemployee" ||
+            location.pathname === "/editemployee" ? (
               <BackToHomeBtn />
             ) : (
-              <AddEmployee />
+              <AddEmployeeBtn />
             )}
           </Toolbar>
         </AppBar>

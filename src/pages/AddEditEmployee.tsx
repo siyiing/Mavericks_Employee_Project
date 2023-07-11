@@ -13,27 +13,56 @@ import {
   FormHelperText,
 } from "@mui/material";
 import Item from "@mui/material/Grid";
-import { Department } from "../store/features/employeeSlice";
+import { Department, EmployeeI } from "../store/features/employeeSlice";
 import classes from "../styles/addemployee.module.css";
 import { useAppDispatch } from "../store/hook";
-import { createEmployeeThunk } from "../store/features/employeeThunk";
-import { Link } from "react-router-dom";
-import "../components/EmployeeList.css";
-import { useLocation } from "react-router-dom";
+import {
+  createEmployeeThunk,
+  updateEmployeeThunk,
+} from "../store/features/employeeThunk";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const AddEmployee = () => {
   const [name, setName] = useState<string>("");
   const [dept, setDept] = useState<string>("");
   const [salary, setSalary] = useState<number>(0);
-
   const [nameError, setNameError] = useState<string>("");
   const [deptError, setDeptError] = useState<string>("");
   const [salaryError, setSalaryError] = useState<string>("");
-
   const [buttonClicked, setButtonClicked] = useState(false);
 
   const dispatch = useAppDispatch();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  // to set and display the employee in the form
+  const editEmp = location.state?.employees;
+  const curEmp = editEmp;
+
+  useEffect(() => {
+    if (location.pathname === "/editemployee" && editEmp) {
+      setName(editEmp.name);
+      setDept(editEmp.department);
+      setSalary(editEmp.salary);
+    }
+  }, [editEmp, location.pathname]);
+
+  const insertEmployee = async (employee: EmployeeI) => {
+    try {
+      await dispatch(createEmployeeThunk(employee)).unwrap(); // unwrap helps to tell me which status it is
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const updateEmployee = async (employee: EmployeeI) => {
+    try {
+      await dispatch(updateEmployeeThunk(employee));
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const handleDeptChange = (event: SelectChangeEvent<typeof dept>) => {
     setDept(event.target.value);
@@ -51,6 +80,11 @@ const AddEmployee = () => {
     } else {
       setNameError("");
     }
+
+    if (/\d/.test(name)) {
+      setNameError("name should not contain numeric values");
+      isValid = false;
+    } else setNameError("");
 
     if (!dept) {
       setDeptError("please select a department");
@@ -72,12 +106,29 @@ const AddEmployee = () => {
   const handleInsertButton = () => {
     setButtonClicked(true);
     if (validateForm()) {
-      let edept: Department = Department[dept as keyof typeof Department];
-
+      let edept: Department = Department[dept as keyof typeof Department]; // get department in form of enum value
       const emp = { name, department: edept, salary };
-      dispatch(createEmployeeThunk(emp));
-      console.log(typeof edept);
-      console.log(name + dept, salary);
+      insertEmployee(emp);
+      navigate("/");
+    }
+  };
+
+  const handleUpdateButton = () => {
+    setButtonClicked(true);
+    if (validateForm()) {
+      let edept: Department = Department[dept as keyof typeof Department]; // get department in form of enum value
+      const emp = { id: editEmp.id, name, department: edept, salary };
+
+      if (
+        emp.name === curEmp.name &&
+        emp.department === curEmp.department &&
+        emp.salary === curEmp.salary
+      ) {
+        alert("Update failed. No changes was made.");
+      } else {
+        updateEmployee(emp);
+        navigate("/");
+      }
     }
   };
 
@@ -86,7 +137,11 @@ const AddEmployee = () => {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Item>
-            <h1 className={classes.addTitle}>Insert New Employee</h1>
+            {location.pathname === "/addemployee" ? (
+              <h1 className={classes.addTitle}>Insert New Employee</h1>
+            ) : (
+              <h1 className={classes.addTitle}>Update Employee Details</h1>
+            )}
           </Item>
         </Grid>
         <Grid item xs={12}>
@@ -144,7 +199,6 @@ const AddEmployee = () => {
                   >
                     <MenuItem value={Department.HR}>HR</MenuItem>
                     <MenuItem value={Department.PS}>PS</MenuItem>
-                    <MenuItem value={Department.ADMIN}>ADMIN</MenuItem>
                   </Select>
                   {buttonClicked && deptError && (
                     <FormHelperText sx={{ color: "#b53737" }}>
@@ -167,37 +221,33 @@ const AddEmployee = () => {
                 />
 
                 {location.pathname === "/addemployee" ? (
-                  <Link to="/">
-                    <Button
-                      fullWidth
-                      variant="contained"
-                      size="large"
-                      onClick={handleInsertButton}
-                      sx={{
-                        fontSize: "1rem",
-                        fontWeight: "bold",
-                        margin: "20px 20px 100px 20px",
-                      }}
-                    >
-                      Insert New Employee
-                    </Button>
-                  </Link>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    size="large"
+                    onClick={handleInsertButton}
+                    sx={{
+                      fontSize: "1rem",
+                      fontWeight: "bold",
+                      margin: "20px 20px 100px 20px",
+                    }}
+                  >
+                    Insert New Employee
+                  </Button>
                 ) : (
-                  <Link to="/">
-                    <Button
-                      fullWidth
-                      variant="contained"
-                      size="large"
-                      onClick={handleInsertButton}
-                      sx={{
-                        fontSize: "1rem",
-                        fontWeight: "bold",
-                        margin: "20px 20px 100px 20px",
-                      }}
-                    >
-                      Update Employee Details
-                    </Button>
-                  </Link>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    size="large"
+                    onClick={handleUpdateButton}
+                    sx={{
+                      fontSize: "1rem",
+                      fontWeight: "bold",
+                      margin: "20px 20px 100px 20px",
+                    }}
+                  >
+                    Update Employee Details
+                  </Button>
                 )}
               </Box>
             </Container>

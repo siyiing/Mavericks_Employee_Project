@@ -1,4 +1,3 @@
-// import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
 import { configureStore } from "@reduxjs/toolkit";
 import { employeeSlice } from "./features/employeeSlice";
 
