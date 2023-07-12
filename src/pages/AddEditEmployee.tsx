@@ -22,6 +22,7 @@ import {
 } from "../store/features/employeeThunk";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import NotifDialog from "../components/NotifDialog";
 
 const AddEmployee = () => {
   const [name, setName] = useState<string>("");
@@ -31,6 +32,9 @@ const AddEmployee = () => {
   const [deptError, setDeptError] = useState<string>("");
   const [salaryError, setSalaryError] = useState<string>("");
   const [buttonClicked, setButtonClicked] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [success, setSuccess] = useState(false);
 
   const dispatch = useAppDispatch();
   const location = useLocation();
@@ -94,11 +98,27 @@ const AddEmployee = () => {
     if (salary <= 0) {
       setSalaryError("salary must be a positive number");
       isValid = false;
+    } else if (salary.toString().includes(".")) {
+      setSalaryError("salary must be a whole number");
+      // setMessage("salary must be a whole number !");
+      isValid = false;
     } else {
       setSalaryError("");
     }
-
     return isValid;
+  };
+
+  const handleDialogOpen = () => {
+    setOpen(true);
+
+    if (location.pathname === "/addemployee") handleInsertButton();
+    else if (location.pathname === "/editemployee") handleUpdateButton();
+  };
+
+  const handleDialogClose = () => {
+    setOpen(false);
+
+    if (success) navigate("/");
   };
 
   const handleInsertButton = () => {
@@ -107,7 +127,10 @@ const AddEmployee = () => {
       let edept: Department = Department[dept as keyof typeof Department]; // get department in form of enum value
       const emp = { name, department: edept, salary };
       insertEmployee(emp);
-      navigate("/");
+      setMessage("insert sucessfully !");
+      setSuccess(true);
+    } else {
+      setMessage("fail to insert.");
     }
   };
 
@@ -122,12 +145,13 @@ const AddEmployee = () => {
         emp.department === curEmp.department &&
         emp.salary === curEmp.salary
       ) {
-        alert("Update failed. No changes was made.");
+        setMessage("Update failed. No changes was made.");
       } else {
         updateEmployee(emp);
-        navigate("/");
+        setSuccess(true);
+        setMessage("updated successfully.");
       }
-    }
+    } else setMessage("failed to update.");
   };
 
   return (
@@ -219,39 +243,48 @@ const AddEmployee = () => {
                 />
 
                 {location.pathname === "/addemployee" ? (
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    size="large"
-                    onClick={handleInsertButton}
-                    sx={{
-                      fontSize: "1rem",
-                      fontWeight: "bold",
-                      margin: "20px 20px 100px 20px",
-                    }}
-                  >
-                    Insert New Employee
-                  </Button>
+                  <>
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      size="large"
+                      onClick={handleDialogOpen}
+                      sx={{
+                        fontSize: "1rem",
+                        fontWeight: "bold",
+                        margin: "20px 20px 100px 20px",
+                      }}
+                    >
+                      Insert New Employee
+                    </Button>
+                  </>
                 ) : (
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    size="large"
-                    onClick={handleUpdateButton}
-                    sx={{
-                      fontSize: "1rem",
-                      fontWeight: "bold",
-                      margin: "20px 20px 100px 20px",
-                    }}
-                  >
-                    Update Employee Details
-                  </Button>
+                  <>
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      size="large"
+                      onClick={handleDialogOpen}
+                      sx={{
+                        fontSize: "1rem",
+                        fontWeight: "bold",
+                        margin: "20px 20px 100px 20px",
+                      }}
+                    >
+                      Update Employee Details
+                    </Button>
+                  </>
                 )}
               </Box>
             </Container>
           </Item>
         </Grid>
       </Grid>
+      <NotifDialog
+        open={open}
+        handleClose={handleDialogClose}
+        message={message}
+      />
     </div>
   );
 };

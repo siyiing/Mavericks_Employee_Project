@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import DeleteDialog from "./DeleteDialog";
 import { EmployeeI } from "../store/features/employeeSlice";
 import Pagination from "./Pagination";
+import NotifDialog from "./NotifDialog";
 
 // import { actions } from '../store/features/employeeSlice'
 
@@ -22,11 +23,11 @@ const EmployeeList = () => {
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [empData, setEmpData] = useState({});
   const [error, setError] = useState<string | null>(null);
 
   const [curPage, setCurPage] = useState(1);
-  const [fullEmp, setFullEmp] = useState<EmployeeI[]>([]); // add a state for the full list
   const [empList, setEmpList] = useState<EmployeeI[]>([]);
   const ITEMS_PER_PAGE = 10;
 
@@ -40,12 +41,20 @@ const EmployeeList = () => {
 
   const handleDeleteClickClose = () => {
     setOpen(false);
+    handleDialogOpen();
+  };
+
+  const handleDialogOpen = () => {
+    setDialogOpen(true);
+  };
+
+  const handleDialogClose = () => {
+    setDialogOpen(false);
   };
 
   const fetchEmployee = async () => {
     try {
-      const result = await dispatch(fetchAllEmployeesThunk()).unwrap(); // unwrap helps to tell me which status it is
-      setFullEmp(result);
+      await dispatch(fetchAllEmployeesThunk()).unwrap(); // unwrap helps to tell me which status it is
     } catch (e) {
       setError("Something is wrong.. Cannot connect to server.");
       console.error(e);
@@ -83,72 +92,55 @@ const EmployeeList = () => {
             {error}
           </Typography>
         ) : (
-          <Grid
-            container
-            spacing="30"
-            sx={{ width: "60%" }}
-            // backgroundColor: "red"
-          >
-            {empList.map(
-              (
-                emp // employees
-              ) => (
-                <Grid
-                  item
-                  key={emp.id}
-                  xs={12}
-                  md={6}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Item>
-                    <Card
-                      sx={{
-                        display: "flex",
-                        width: 300,
-                        height: 110,
-                        backgroundColor: "#eeeeee",
-                        color: "#00446d",
-                      }}
-                    >
-                      <CardContent sx={{ flexGrow: 1 }}>
-                        <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-                          {emp.name}
-                        </Typography>
-                        <Typography variant="body1">
-                          {emp.department}
-                        </Typography>
-                        <Typography variant="body1">${emp.salary}</Typography>
-                      </CardContent>
+          <Grid container spacing="30" sx={{ width: "60%" }}>
+            {empList.map((emp) => (
+              <Grid
+                item
+                key={emp.id}
+                xs={12}
+                md={6}
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <Item>
+                  <Card
+                    sx={{
+                      display: "flex",
+                      width: 300,
+                      height: 110,
+                      backgroundColor: "#eeeeee",
+                      color: "#00446d",
+                    }}
+                  >
+                    <CardContent sx={{ flexGrow: 1 }}>
+                      <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                        {emp.name}
+                      </Typography>
+                      <Typography variant="body1">{emp.department}</Typography>
+                      <Typography variant="body1">${emp.salary}</Typography>
+                    </CardContent>
 
-                      <CardActions>
-                        <ModeEditIcon
-                          style={{ color: "orange" }}
-                          onClick={() => {
-                            navigate("/editemployee", {
-                              state: { employees: emp },
-                            });
-                          }}
-                        />
+                    <CardActions>
+                      <ModeEditIcon
+                        style={{ color: "orange" }}
+                        onClick={() => {
+                          navigate("/editemployee", {
+                            state: { employees: emp },
+                          });
+                        }}
+                      />
 
-                        <DeleteIcon
-                          style={{ color: "red" }}
-                          onClick={() => handleDeleteClickOpen(emp)}
-                        />
-                        <DeleteDialog
-                          open={open}
-                          handleClose={handleDeleteClickClose}
-                          employee={empData}
-                          refreshEmployees={fetchEmployee}
-                        />
-                      </CardActions>
-                    </Card>
-                  </Item>
-                </Grid>
-              )
-            )}
+                      <DeleteIcon
+                        style={{ color: "red" }}
+                        onClick={() => handleDeleteClickOpen(emp)}
+                      />
+                    </CardActions>
+                  </Card>
+                </Item>
+              </Grid>
+            ))}
           </Grid>
         )}
         <Pagination
@@ -158,6 +150,18 @@ const EmployeeList = () => {
           onPageChange={setCurPage}
         />
       </Box>
+
+      <DeleteDialog
+        open={open}
+        handleClose={handleDeleteClickClose}
+        employee={empData}
+        refreshEmployees={fetchEmployee}
+      />
+      <NotifDialog
+        open={dialogOpen}
+        handleClose={handleDialogClose}
+        message={"delete successfully"}
+      />
     </div>
   );
 };

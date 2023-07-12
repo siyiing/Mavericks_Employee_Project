@@ -3,10 +3,8 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-
 import { deleteEmployeeThunk } from "../store/features/employeeThunk";
 import { useAppDispatch } from "../store/hook";
-import { useState } from "react";
 
 type DeleteDialogProps = {
   open: boolean;
@@ -14,9 +12,13 @@ type DeleteDialogProps = {
   employee: any;
 };
 
-const DeleteDialog = ({open, handleClose, employee, refreshEmployees}: DeleteDialogProps & { refreshEmployees: () => void }) => {
+const DeleteDialog = ({
+  open,
+  handleClose,
+  employee,
+  refreshEmployees,
+}: DeleteDialogProps & { refreshEmployees: () => void }) => {
   const dispatch = useAppDispatch();
-  const [refresh, setRefresh] = useState(false);
 
   const deleteEmployee = async (id: number) => {
     try {
@@ -29,7 +31,6 @@ const DeleteDialog = ({open, handleClose, employee, refreshEmployees}: DeleteDia
 
   const handleDeleteButton = (id: number) => {
     deleteEmployee(id);
-    setRefresh(!refresh);
     handleClose();
   };
 
@@ -49,8 +50,6 @@ const DeleteDialog = ({open, handleClose, employee, refreshEmployees}: DeleteDia
         </div>
       </DialogContent>
       <DialogActions>
-
-        {}
         <Button onClick={handleClose}>Cancel</Button>
         <Button onClick={() => handleDeleteButton(employee.id)}>Delete</Button>
       </DialogActions>
