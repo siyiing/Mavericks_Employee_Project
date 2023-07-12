@@ -14,9 +14,7 @@ type DeleteDialogProps = {
   employee: any;
 };
 
-const DeleteDialog: React.FC<
-  DeleteDialogProps & { refreshEmployees: () => void }
-> = ({ open, handleClose, employee, refreshEmployees }) => {
+const DeleteDialog = ({open, handleClose, employee, refreshEmployees}: DeleteDialogProps & { refreshEmployees: () => void }) => {
   const dispatch = useAppDispatch();
   const [refresh, setRefresh] = useState(false);
 

@@ -72,7 +72,10 @@ const AddEmployee = () => {
   const validateForm = () => {
     let isValid = true;
 
-    if (name.length < 4 || name.length > 30) {
+    if (/\d/.test(name)) {
+      setNameError("name should not contain numeric values");
+      isValid = false;
+    } else if (name.length < 4 || name.length > 30) {
       setNameError(
         "name should be at least 4 characters and not exceed 30 characters"
       );
@@ -80,11 +83,6 @@ const AddEmployee = () => {
     } else {
       setNameError("");
     }
-
-    if (/\d/.test(name)) {
-      setNameError("name should not contain numeric values");
-      isValid = false;
-    } else setNameError("");
 
     if (!dept) {
       setDeptError("please select a department");

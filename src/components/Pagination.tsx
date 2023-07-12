@@ -1,16 +1,20 @@
 import { Box, Typography, Button } from "@mui/material";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
 
 interface PageProps {
   totalCount: number;
   curPage: number;
   displayCount: number;
+  onPageChange: (newPage: number) => void;
 }
 
-const Pagination: React.FC<PageProps> = ({
+const Pagination = ({
   totalCount,
   curPage,
   displayCount,
-}) => {
+  onPageChange,
+}: PageProps) => {
   let startRange;
   if (totalCount === 0) startRange = 0;
   else {
@@ -22,6 +26,9 @@ const Pagination: React.FC<PageProps> = ({
     if (totalCount <= 10) return true;
     else return false;
   };
+
+    const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
     <Box
@@ -38,15 +45,17 @@ const Pagination: React.FC<PageProps> = ({
         height: 40,
       }}
     >
-      <Typography variant="body1">
-        {"Showing "}
-        <b>
-          {startRange}-{endRange}
-        </b>
-        {" out of "}
-        {totalCount}
-        {" entries"}
-      </Typography>
+      {!isSmallScreen && (
+        <Typography variant="body1">
+          {"Showing "}
+          <b>
+            {startRange}-{endRange}
+          </b>
+          {" out of "}
+          {totalCount}
+          {" entries"}
+        </Typography>
+      )}
 
       {checkIfPage() ? (
         <Box sx={{ display: "flex" }}>
@@ -60,11 +69,31 @@ const Pagination: React.FC<PageProps> = ({
         </Box>
       ) : (
         <Box sx={{ fontWeight: "bold" }}>
-          <Button size="small" sx={{ fontWeight: "bold" }}>
+          <Button
+            size="small"
+            disabled={curPage === 1}
+            onClick={() => onPageChange(curPage - 1)}
+            sx={{
+              fontWeight: "bold",
+              "&:hover": {
+                textDecoration: "underline",
+              },
+            }}
+          >
             Previous
           </Button>
           {curPage}
-          <Button size="small" sx={{ fontWeight: "bold" }}>
+          <Button
+            size="small"
+            disabled={curPage === Math.ceil(totalCount / displayCount)}
+            onClick={() => onPageChange(curPage + 1)}
+            sx={{
+              fontWeight: "bold",
+              "&:hover": {
+                textDecoration: "underline",
+              },
+            }}
+          >
             Next
           </Button>
         </Box>

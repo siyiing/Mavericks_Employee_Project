@@ -19,14 +19,19 @@ import Pagination from "./Pagination";
 const EmployeeList = () => {
   const dispatch = useAppDispatch();
   // const employee = useAppSelector(employeeState);
-  const employees = useAppSelector((state) => state.employee.employees);
   const navigate = useNavigate();
-
-  const count = employees.length;
 
   const [open, setOpen] = useState(false);
   const [empData, setEmpData] = useState({});
   const [error, setError] = useState<string | null>(null);
+
+  const [curPage, setCurPage] = useState(1);
+  const [fullEmp, setFullEmp] = useState<EmployeeI[]>([]); // add a state for the full list
+  const [empList, setEmpList] = useState<EmployeeI[]>([]);
+  const ITEMS_PER_PAGE = 10;
+
+  const fetchedEmployees = useAppSelector((state) => state.employee.employees);
+  const count = fetchedEmployees.length;
 
   const handleDeleteClickOpen = (emp: EmployeeI) => {
     setEmpData(emp);
@@ -37,19 +42,28 @@ const EmployeeList = () => {
     setOpen(false);
   };
 
-  useEffect(() => {
-    fetchEmployee();
-  }, []);
-
   const fetchEmployee = async () => {
     try {
-      await dispatch(fetchAllEmployeesThunk()).unwrap(); // unwrap helps to tell me which status it is
-      setError("");
+      const result = await dispatch(fetchAllEmployeesThunk()).unwrap(); // unwrap helps to tell me which status it is
+      setFullEmp(result);
     } catch (e) {
       setError("Something is wrong.. Cannot connect to server.");
       console.error(e);
     }
   };
+
+  useEffect(() => {
+    fetchEmployee();
+  }, [dispatch]); // depend on curPage to refresh when page change
+
+  useEffect(() => {
+    const sortedEmployees = [...fetchedEmployees].sort(
+      (a, b) => (a.id || 0) - (b.id || 0)
+    ); // Sort employees by id in ascending order
+    const startItem = (curPage - 1) * ITEMS_PER_PAGE;
+    const endItem = startItem + ITEMS_PER_PAGE;
+    setEmpList(sortedEmployees.slice(startItem, endItem));
+  }, [curPage, fetchedEmployees]); // slice the list anytime the page or the full list is updated
 
   // useEffect(()=> {
   //   dispatch(actions.changePage(false));
@@ -75,63 +89,74 @@ const EmployeeList = () => {
             sx={{ width: "60%" }}
             // backgroundColor: "red"
           >
-            {employees.map((emp) => (
-              <Grid
-                item
-                key={emp.id}
-                xs={12}
-                md={6}
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                }}
-              >
-                <Item>
-                  <Card
-                    sx={{
-                      display: "flex",
-                      width: 300,
-                      height: 110,
-                      backgroundColor: "#eeeeee",
-                      color: "#00446d",
-                    }}
-                  >
-                    <CardContent sx={{ flexGrow: 1 }}>
-                      <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-                        {emp.name}
-                      </Typography>
-                      <Typography variant="body1">{emp.department}</Typography>
-                      <Typography variant="body1">${emp.salary}</Typography>
-                    </CardContent>
+            {empList.map(
+              (
+                emp // employees
+              ) => (
+                <Grid
+                  item
+                  key={emp.id}
+                  xs={12}
+                  md={6}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Item>
+                    <Card
+                      sx={{
+                        display: "flex",
+                        width: 300,
+                        height: 110,
+                        backgroundColor: "#eeeeee",
+                        color: "#00446d",
+                      }}
+                    >
+                      <CardContent sx={{ flexGrow: 1 }}>
+                        <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                          {emp.name}
+                        </Typography>
+                        <Typography variant="body1">
+                          {emp.department}
+                        </Typography>
+                        <Typography variant="body1">${emp.salary}</Typography>
+                      </CardContent>
 
-                    <CardActions>
-                      <ModeEditIcon
-                        style={{ color: "orange" }}
-                        onClick={() => {
-                          navigate("/editemployee", {
-                            state: { employees: emp },
-                          });
-                        }}
-                      />
+                      <CardActions>
+                        <ModeEditIcon
+                          style={{ color: "orange" }}
+                          onClick={() => {
+                            navigate("/editemployee", {
+                              state: { employees: emp },
+                            });
+                          }}
+                        />
 
-                      <DeleteIcon
-                        style={{ color: "red" }}
-                        onClick={() => handleDeleteClickOpen(emp)}
-                      />
-                      <DeleteDialog
-                        open={open}
-                        handleClose={handleDeleteClickClose}
-                        employee={empData}
-                        refreshEmployees={fetchEmployee}
-                      />
-                    </CardActions>
-                  </Card>
-                </Item>
-              </Grid>
-            ))}
+                        <DeleteIcon
+                          style={{ color: "red" }}
+                          onClick={() => handleDeleteClickOpen(emp)}
+                        />
+                        <DeleteDialog
+                          open={open}
+                          handleClose={handleDeleteClickClose}
+                          employee={empData}
+                          refreshEmployees={fetchEmployee}
+                        />
+                      </CardActions>
+                    </Card>
+                  </Item>
+                </Grid>
+              )
+            )}
           </Grid>
         )}
-        <Pagination totalCount={count} curPage={1} displayCount={10} />
+        <Pagination
+          totalCount={count}
+          curPage={curPage}
+          displayCount={ITEMS_PER_PAGE}
+          onPageChange={setCurPage}
+        />
       </Box>
     </div>
   );
