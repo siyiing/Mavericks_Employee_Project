@@ -20,11 +20,20 @@ import {
   createEmployeeThunk,
   updateEmployeeThunk,
 } from "../store/features/employeeThunk";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import NotifDialog from "../components/NotifDialog";
+import { notificationDialogActions } from "../store/features/notificationDialogSlice";
+import { employeeFormActions } from "../store/features/employeeFormSlice";
 
-const AddEmployee = () => {
+const AddEditEmployee = () => {
+  const dispatch = useAppDispatch();
+  const location = useLocation();
+
+  dispatch(
+    notificationDialogActions.setLocation({ location: location.pathname })
+  );
+
   const [name, setName] = useState<string>("");
   const [dept, setDept] = useState<string>("");
   const [salary, setSalary] = useState<number>(0);
@@ -32,16 +41,8 @@ const AddEmployee = () => {
   const [deptError, setDeptError] = useState<string>("");
   const [salaryError, setSalaryError] = useState<string>("");
   const [buttonClicked, setButtonClicked] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [message, setMessage] = useState("");
-  const [success, setSuccess] = useState(false);
   const [modeTitle, setModeTitle] = useState("");
 
-  const dispatch = useAppDispatch();
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  // to set and display the employee in the form
   const editEmp = location.state?.employees;
   const curEmp = editEmp;
 
@@ -63,7 +64,7 @@ const AddEmployee = () => {
 
   const insertEmployee = async (employee: EmployeeI) => {
     try {
-      await dispatch(createEmployeeThunk(employee)).unwrap(); // unwrap helps to tell me which status it is
+      await dispatch(createEmployeeThunk(employee)).unwrap();
     } catch (e) {
       console.error(e);
     }
@@ -109,7 +110,6 @@ const AddEmployee = () => {
       isValid = false;
     } else if (salary.toString().includes(".")) {
       setSalaryError("salary must be a whole number");
-      // setMessage("salary must be a whole number !");
       isValid = false;
     } else {
       setSalaryError("");
@@ -118,16 +118,10 @@ const AddEmployee = () => {
   };
 
   const handleDialogOpen = () => {
-    setOpen(true);
+    dispatch(notificationDialogActions.setOpen({ open: true }));
 
     if (modeTitle === "Insert New Employee") handleInsertButton();
     else if (modeTitle === "Update Employee Details") handleUpdateButton();
-  };
-
-  const handleDialogClose = () => {
-    setOpen(false);
-
-    if (success) navigate("/");
   };
 
   const handleInsertButton = () => {
@@ -136,10 +130,17 @@ const AddEmployee = () => {
       let edept: Department = Department[dept as keyof typeof Department]; // get department in form of enum value
       const emp = { name, department: edept, salary };
       insertEmployee(emp);
-      setMessage("insert sucessfully !");
-      setSuccess(true);
+      dispatch(employeeFormActions.setSuccess({ success: true }));
+      dispatch(
+        notificationDialogActions.setMessage({
+          message: "insert sucessfully !",
+        })
+      );
     } else {
-      setMessage("fail to insert.");
+      dispatch(employeeFormActions.setSuccess({ success: false }));
+      dispatch(
+        notificationDialogActions.setMessage({ message: "fail to insert." })
+      );
     }
   };
 
@@ -154,13 +155,27 @@ const AddEmployee = () => {
         emp.department === curEmp.department &&
         emp.salary === curEmp.salary
       ) {
-        setMessage("Update failed. No changes was made.");
+        dispatch(employeeFormActions.setSuccess({ success: false }));
+        dispatch(
+          notificationDialogActions.setMessage({
+            message: "Update failed. No changes made.",
+          })
+        );
       } else {
         updateEmployee(emp);
-        setSuccess(true);
-        setMessage("updated successfully.");
+        dispatch(employeeFormActions.setSuccess({ success: true }));
+        dispatch(
+          notificationDialogActions.setMessage({
+            message: "updated successfully.",
+          })
+        );
       }
-    } else setMessage("failed to update.");
+    } else {
+      dispatch(employeeFormActions.setSuccess({ success: false }));
+      dispatch(
+        notificationDialogActions.setMessage({ message: "failed to update." })
+      );
+    }
   };
 
   return (
@@ -265,13 +280,9 @@ const AddEmployee = () => {
           </Item>
         </Grid>
       </Grid>
-      <NotifDialog
-        open={open}
-        handleClose={handleDialogClose}
-        message={message}
-      />
+      <NotifDialog />
     </div>
   );
 };
 
-export default AddEmployee;
+export default AddEditEmployee;

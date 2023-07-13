@@ -9,46 +9,43 @@ import { Box, Grid } from "@mui/material";
 import Item from "@mui/material/Grid";
 import { fetchAllEmployeesThunk } from "../store/features/employeeThunk";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import DeleteDialog from "./DeleteDialog";
-import { EmployeeI } from "../store/features/employeeSlice";
+import { EmployeeI, employeeAction } from "../store/features/employeeSlice";
 import Pagination from "./Pagination";
 import NotifDialog from "./NotifDialog";
+import { notificationDialogActions } from "../store/features/notificationDialogSlice";
+import { deleteDialogActions } from "../store/features/deleteDialogSlice";
+import { employeeFormActions } from "../store/features/employeeFormSlice";
+import { paginationAction } from "../store/features/paginationSlice";
 
 const EmployeeList = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
-  const [open, setOpen] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [empData, setEmpData] = useState({});
-  const [error, setError] = useState<string | null>(null);
-
-  const [curPage, setCurPage] = useState(1);
-  const [empList, setEmpList] = useState<EmployeeI[]>([]);
-  const ITEMS_PER_PAGE = 10;
+  const location = useLocation();
 
   const fetchedEmployees = useAppSelector((state) => state.employee.employees);
+  const [error, setError] = useState<string | null>(null);
+
+  // PAGINATION
   const count = fetchedEmployees.length;
+  dispatch(
+    notificationDialogActions.setLocation({ location: location.pathname })
+  );
+  dispatch(employeeAction.setTotalCount({ totalCount: count }));
+  const curPage = useAppSelector((state) => state.pagination.curPage);
+  const itemPerPage = useAppSelector((state) => state.pagination.itemPerPage);
+  console.log(count);
 
+  const [empList, setEmpList] = useState<EmployeeI[]>([]);
+
+  // DELETE DIALOG
   const handleDeleteClickOpen = (emp: EmployeeI) => {
-    setEmpData(emp);
-    setOpen(true);
+    dispatch(employeeFormActions.setEmployeeData({ empData: emp }));
+    dispatch(deleteDialogActions.setOpen({ open: true }));
   };
 
-  const handleDeleteClickClose = () => {
-    setOpen(false);
-    handleDialogOpen();
-  };
-
-  const handleDialogOpen = () => {
-    setDialogOpen(true);
-  };
-
-  const handleDialogClose = () => {
-    setDialogOpen(false);
-  };
-
+  // FETCH FROM SERVER
   const fetchEmployee = async () => {
     try {
       await dispatch(fetchAllEmployeesThunk()).unwrap(); // unwrap helps to tell me which status it is
@@ -60,19 +57,25 @@ const EmployeeList = () => {
 
   useEffect(() => {
     fetchEmployee();
-  }, [dispatch]); // depend on curPage to refresh when page change
+    dispatch(paginationAction.setCurPage({ curPage: curPage }));
+    console.log("count", count);
+  }, []); // depend on curPage to refresh when page change
+
+  // useEffect(() => {
+  //   fetchEmployee();
+  // }, [fetchedEmployees]); // depend on curPage to refresh when page change
 
   useEffect(() => {
     const sortedEmployees = [...fetchedEmployees].sort(
       (a, b) => (a.id || 0) - (b.id || 0)
     ); // sort employees by id in ascending order
-    const startItem = (curPage - 1) * ITEMS_PER_PAGE;
-    const endItem = startItem + ITEMS_PER_PAGE;
+    const startItem = (curPage - 1) * itemPerPage;
+    const endItem = startItem + itemPerPage;
     setEmpList(sortedEmployees.slice(startItem, endItem));
   }, [curPage, fetchedEmployees]); // slice the list anytime the page or the full list is updated
 
   return (
-    <div>
+    <div style={{ maxWidth: 1280, margin: "0 auto" }}>
       <Box
         sx={{
           display: "flex",
@@ -84,12 +87,18 @@ const EmployeeList = () => {
           <Typography color="error" variant="h6" sx={{ textAlign: "center" }}>
             {error}
           </Typography>
-        ) : count == 0 ? (
+        ) : count === 0 ? (
           <Typography color="error" variant="h6" sx={{ textAlign: "center" }}>
             {"No Existing Employee"}
           </Typography>
         ) : (
-          <Grid container spacing="30" sx={{ width: "60%" }}>
+          <Grid
+            container
+            spacing="30"
+            sx={{
+              width: "60%",
+            }}
+          >
             {empList.map((emp) => (
               <Grid
                 item
@@ -140,25 +149,12 @@ const EmployeeList = () => {
             ))}
           </Grid>
         )}
-        <Pagination
-          totalCount={count}
-          curPage={curPage}
-          displayCount={ITEMS_PER_PAGE}
-          onPageChange={setCurPage}
-        />
+        <Pagination />
       </Box>
 
-      <DeleteDialog
-        open={open}
-        handleClose={handleDeleteClickClose}
-        employee={empData}
-        refreshEmployees={fetchEmployee}
-      />
-      <NotifDialog
-        open={dialogOpen}
-        handleClose={handleDialogClose}
-        message={"delete successfully"}
-      />
+      <DeleteDialog refreshEmployees={fetchEmployee} />
+
+      <NotifDialog />
     </div>
   );
 };

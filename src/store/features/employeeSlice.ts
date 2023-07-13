@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit"
+import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { createEmployeeThunk, deleteEmployeeThunk, fetchAllEmployeesThunk, updateEmployeeThunk } from "./employeeThunk";
 import { RootState } from "../store";
 
@@ -14,22 +14,25 @@ export interface EmployeeI {
 interface EmployeeState {
   employees: Array<EmployeeI>;
   isLoading: boolean;
+  totalCount: number;
 }
 
 const initialState: EmployeeState = {
   employees: [],
   isLoading: false,
+  totalCount: 0
 }
+
+const setTotalCount = (state: EmployeeState, action: PayloadAction<{totalCount: number}>) => {
+  state.totalCount = action.payload.totalCount;
+} 
+
 
 export const employeeSlice = createSlice({
   name: 'employee', 
   initialState,
   reducers: { 
-    // if want trigger page change for pagination, can write a function e,g,
-    // if want to change internal state of the redux, need come to slice 
-    // changePage(state, action: PayloadAction<boolean>) {
-    //   state.isLoading = action.payload;
-    // }
+    setTotalCount,
   }, 
   extraReducers:(builders) => {
     builders // 3 basic states = pending, fulfilled and rejected 
@@ -77,6 +80,6 @@ export const employeeSlice = createSlice({
   }
 })
 
+export const employeeAction = employeeSlice.actions;
 export default employeeSlice.reducer;
 export const employeeState = (state: RootState) => state.employee;
-// export const { actions } = employeeSlice;

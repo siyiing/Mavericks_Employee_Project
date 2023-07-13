@@ -2,14 +2,33 @@ import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogTitle from "@mui/material/DialogTitle";
+import { useAppSelector, useAppDispatch } from "../store/hook";
+import { notificationDialogActions } from "../store/features/notificationDialogSlice";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
-type NotifDialogProps = {
-  open: boolean;
-  handleClose: () => void;
-  message: string;
-};
+const NotifDialog = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const open = useAppSelector((state) => state.notificationdialog.open);
+  const message = useAppSelector((state) => state.notificationdialog.message);
+  const location = useAppSelector((state) => state.notificationdialog.location);
+  const success = useAppSelector((state) => state.employeeform.success);
 
-const NotifDialog = ({ open, handleClose, message }: NotifDialogProps) => {
+  const handleClose = () => {
+    dispatch(notificationDialogActions.setOpen({ open: false }));
+
+    if (
+      (location === "/addemployee" || location === "/editemployee") &&
+      success
+    )
+      navigate("/");
+  };
+
+  useEffect(() => {
+    handleClose();
+  }, []); // depend on curPage to refresh when page change
+
   return (
     <Dialog
       open={open}

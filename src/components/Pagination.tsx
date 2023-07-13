@@ -1,32 +1,23 @@
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import PaginationBtn from "./PaginationBtn";
+import { useAppSelector } from "../store/hook";
 
-interface PageProps {
-  totalCount: number;
-  curPage: number;
-  displayCount: number;
-  onPageChange: (newPage: number) => void;
-}
+const Pagination = () => {
+  const curPage = useAppSelector((state) => state.pagination.curPage);
+  const totalItemCount = useAppSelector(
+    (state) => state.employee.totalCount
+  );
+  const itemPerPage = useAppSelector((state) => state.pagination.itemPerPage);
 
-const Pagination = ({
-  totalCount,
-  curPage,
-  displayCount,
-  onPageChange,
-}: PageProps) => {
   let startRange;
-  if (totalCount === 0) startRange = 0;
-  else {
-    startRange = (curPage - 1) * displayCount + 1;
-  }
-  const endRange = Math.min(curPage * displayCount, totalCount);
 
-  const checkIfPage = () => {
-    if (totalCount <= 10) return true;
-    else return false;
-  };
+  if (totalItemCount === 0) startRange = 0;
+  else {
+    startRange = (curPage - 1) * itemPerPage + 1;
+  }
+  const endRange = Math.min(curPage * itemPerPage, totalItemCount);
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
@@ -53,26 +44,11 @@ const Pagination = ({
             {startRange}-{endRange}
           </b>
           {" out of "}
-          {totalCount}
+          {totalItemCount}
           {" entries"}
         </Typography>
       )}
-
-      {checkIfPage() ? (
-        <PaginationBtn
-          preDisabled={true}
-          nextDisabled={true}
-          curPage={curPage}
-          onPageChange={onPageChange}
-        />
-      ) : (
-        <PaginationBtn
-          preDisabled={curPage === 1}
-          nextDisabled={curPage === Math.ceil(totalCount / displayCount)}
-          curPage={curPage}
-          onPageChange={onPageChange}
-        />
-      )}
+      <PaginationBtn />
     </Box>
   );
 };

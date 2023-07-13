@@ -1,6 +1,6 @@
 import Header from "../components/Header";
 import EmployeeList from "../components/EmployeeList";
-import AddEmployee from "./AddEditEmployee";
+import AddEditEmployee from "./AddEditEmployee";
 import NotFound from "../pages/NotFound";
 import { Routes, Route } from "react-router-dom";
 
@@ -10,8 +10,8 @@ const Home = () => {
       <Header />
       <Routes>
         <Route path="/" element={<EmployeeList />} />
-        <Route path="/addEmployee" element={<AddEmployee />} />
-        <Route path="/editEmployee" element={<AddEmployee />} />
+        <Route path="/addEmployee" element={<AddEditEmployee />} />
+        <Route path="/editEmployee" element={<AddEditEmployee />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
