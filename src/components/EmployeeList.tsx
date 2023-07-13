@@ -15,11 +15,8 @@ import { EmployeeI } from "../store/features/employeeSlice";
 import Pagination from "./Pagination";
 import NotifDialog from "./NotifDialog";
 
-// import { actions } from '../store/features/employeeSlice'
-
 const EmployeeList = () => {
   const dispatch = useAppDispatch();
-  // const employee = useAppSelector(employeeState);
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
@@ -68,15 +65,11 @@ const EmployeeList = () => {
   useEffect(() => {
     const sortedEmployees = [...fetchedEmployees].sort(
       (a, b) => (a.id || 0) - (b.id || 0)
-    ); // Sort employees by id in ascending order
+    ); // sort employees by id in ascending order
     const startItem = (curPage - 1) * ITEMS_PER_PAGE;
     const endItem = startItem + ITEMS_PER_PAGE;
     setEmpList(sortedEmployees.slice(startItem, endItem));
   }, [curPage, fetchedEmployees]); // slice the list anytime the page or the full list is updated
-
-  // useEffect(()=> {
-  //   dispatch(actions.changePage(false));
-  // }, [])
 
   return (
     <div>
@@ -90,6 +83,10 @@ const EmployeeList = () => {
         {error ? (
           <Typography color="error" variant="h6" sx={{ textAlign: "center" }}>
             {error}
+          </Typography>
+        ) : count == 0 ? (
+          <Typography color="error" variant="h6" sx={{ textAlign: "center" }}>
+            {"No Existing Employee"}
           </Typography>
         ) : (
           <Grid container spacing="30" sx={{ width: "60%" }}>

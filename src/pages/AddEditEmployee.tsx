@@ -35,6 +35,7 @@ const AddEmployee = () => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
+  const [modeTitle, setModeTitle] = useState("");
 
   const dispatch = useAppDispatch();
   const location = useLocation();
@@ -51,6 +52,14 @@ const AddEmployee = () => {
       setSalary(editEmp.salary);
     }
   }, [editEmp, location.pathname]);
+
+  useEffect(() => {
+    if (location.pathname === "/addemployee") {
+      setModeTitle("Insert New Employee");
+    } else if (location.pathname === "/editemployee") {
+      setModeTitle("Update Employee Details");
+    }
+  }, [location.pathname]);
 
   const insertEmployee = async (employee: EmployeeI) => {
     try {
@@ -111,8 +120,8 @@ const AddEmployee = () => {
   const handleDialogOpen = () => {
     setOpen(true);
 
-    if (location.pathname === "/addemployee") handleInsertButton();
-    else if (location.pathname === "/editemployee") handleUpdateButton();
+    if (modeTitle === "Insert New Employee") handleInsertButton();
+    else if (modeTitle === "Update Employee Details") handleUpdateButton();
   };
 
   const handleDialogClose = () => {
@@ -159,11 +168,7 @@ const AddEmployee = () => {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Item>
-            {location.pathname === "/addemployee" ? (
-              <h1 className={classes.addTitle}>Insert New Employee</h1>
-            ) : (
-              <h1 className={classes.addTitle}>Update Employee Details</h1>
-            )}
+            <h1 className={classes.addTitle}>{modeTitle}</h1>
           </Item>
         </Grid>
         <Grid item xs={12}>
@@ -242,39 +247,19 @@ const AddEmployee = () => {
                   inputProps={{ min: 0 }}
                 />
 
-                {location.pathname === "/addemployee" ? (
-                  <>
-                    <Button
-                      fullWidth
-                      variant="contained"
-                      size="large"
-                      onClick={handleDialogOpen}
-                      sx={{
-                        fontSize: "1rem",
-                        fontWeight: "bold",
-                        margin: "20px 20px 100px 20px",
-                      }}
-                    >
-                      Insert New Employee
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button
-                      fullWidth
-                      variant="contained"
-                      size="large"
-                      onClick={handleDialogOpen}
-                      sx={{
-                        fontSize: "1rem",
-                        fontWeight: "bold",
-                        margin: "20px 20px 100px 20px",
-                      }}
-                    >
-                      Update Employee Details
-                    </Button>
-                  </>
-                )}
+                <Button
+                  fullWidth
+                  variant="contained"
+                  size="large"
+                  onClick={handleDialogOpen}
+                  sx={{
+                    fontSize: "1rem",
+                    fontWeight: "bold",
+                    margin: "20px 20px 100px 20px",
+                  }}
+                >
+                  {modeTitle}
+                </Button>
               </Box>
             </Container>
           </Item>

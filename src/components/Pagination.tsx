@@ -1,6 +1,7 @@
 import { Box, Typography, Button } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
+import PaginationBtn from "./PaginationBtn";
 
 interface PageProps {
   totalCount: number;
@@ -27,7 +28,7 @@ const Pagination = ({
     else return false;
   };
 
-    const theme = useTheme();
+  const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
@@ -58,45 +59,19 @@ const Pagination = ({
       )}
 
       {checkIfPage() ? (
-        <Box sx={{ display: "flex" }}>
-          <Button size="small" disabled sx={{ fontWeight: "bold" }}>
-            Previous
-          </Button>
-          {curPage}
-          <Button size="small" disabled sx={{ fontWeight: "bold" }}>
-            Next
-          </Button>
-        </Box>
+        <PaginationBtn
+          preDisabled={true}
+          nextDisabled={true}
+          curPage={curPage}
+          onPageChange={onPageChange}
+        />
       ) : (
-        <Box sx={{ fontWeight: "bold" }}>
-          <Button
-            size="small"
-            disabled={curPage === 1}
-            onClick={() => onPageChange(curPage - 1)}
-            sx={{
-              fontWeight: "bold",
-              "&:hover": {
-                textDecoration: "underline",
-              },
-            }}
-          >
-            Previous
-          </Button>
-          {curPage}
-          <Button
-            size="small"
-            disabled={curPage === Math.ceil(totalCount / displayCount)}
-            onClick={() => onPageChange(curPage + 1)}
-            sx={{
-              fontWeight: "bold",
-              "&:hover": {
-                textDecoration: "underline",
-              },
-            }}
-          >
-            Next
-          </Button>
-        </Box>
+        <PaginationBtn
+          preDisabled={curPage === 1}
+          nextDisabled={curPage === Math.ceil(totalCount / displayCount)}
+          curPage={curPage}
+          onPageChange={onPageChange}
+        />
       )}
     </Box>
   );
