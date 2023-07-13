@@ -6,9 +6,7 @@ import { useAppSelector } from "../store/hook";
 
 const Pagination = () => {
   const curPage = useAppSelector((state) => state.pagination.curPage);
-  const totalItemCount = useAppSelector(
-    (state) => state.employee.totalCount
-  );
+  const totalItemCount = useAppSelector((state) => state.employee.totalCount);
   const itemPerPage = useAppSelector((state) => state.pagination.itemPerPage);
 
   let startRange;

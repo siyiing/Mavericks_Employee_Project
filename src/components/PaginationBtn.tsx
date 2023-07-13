@@ -11,37 +11,29 @@ const PaginationBtn = () => {
   const preDisabled = useAppSelector((state) => state.pagination.preDisabled);
   const nextDisabled = useAppSelector((state) => state.pagination.nextDisabled);
 
-  // useEffect(() => {
-  //   if (totalItemCount <= 10) {
-  //     dispatch(paginationAction.setPreDisabled({ preDisabled: true }));
-  //     dispatch(paginationAction.setNextDisabled({ nextDisabled: true }));
-  //     dispatch(paginationAction.setCurPage({ curPage: curPage }));
-  //   } else {
-  //     dispatch(paginationAction.setCurPage({ curPage: curPage }));
-  //     console.log("curpage", curPage);
-  //     dispatch(paginationAction.setPreDisabled({ preDisabled: curPage === 1 }));
-  //     dispatch(
-  //       paginationAction.setNextDisabled({
-  //         nextDisabled: curPage === Math.ceil(totalItemCount / itemPerPage),
-  //       })
-  //     );
-  //   }
-  // }, []);
+  const checkItemCount = () => {
+    if (totalItemCount <= 10) {
+      dispatch(paginationAction.setPreDisabled({ preDisabled: true }));
+      dispatch(paginationAction.setNextDisabled({ nextDisabled: true }));
+    } else {
+      dispatch(paginationAction.setPreDisabled({ preDisabled: curPage === 1 }));
+      dispatch(
+        paginationAction.setNextDisabled({
+          nextDisabled: curPage === Math.ceil(totalItemCount / itemPerPage),
+        })
+      );
+    }
+  };
 
-  if (totalItemCount <= 10) {
-    dispatch(paginationAction.setPreDisabled({ preDisabled: true }));
-    dispatch(paginationAction.setNextDisabled({ nextDisabled: true }));
-    dispatch(paginationAction.setCurPage({ curPage: curPage }));
-  } else {
-    dispatch(paginationAction.setCurPage({ curPage: curPage }));
-    console.log("curpage", curPage);
-    dispatch(paginationAction.setPreDisabled({ preDisabled: curPage === 1 }));
-    dispatch(
-      paginationAction.setNextDisabled({
-        nextDisabled: curPage === Math.ceil(totalItemCount / itemPerPage),
-      })
-    );
-  }
+  useEffect(() => {
+    checkItemCount();
+  }, [curPage]); // depend on curPage to refresh when page change
+
+  useEffect(() => {
+    const totalPage = Math.ceil(totalItemCount / itemPerPage);
+    if (totalPage !== curPage)
+      dispatch(paginationAction.setCurPage({ curPage: totalPage }));
+  }, [totalItemCount]); // depend on curPage to refresh when page change
 
   const handlePreviousPage = () => {
     dispatch(paginationAction.setCurPage({ curPage: curPage - 1 }));

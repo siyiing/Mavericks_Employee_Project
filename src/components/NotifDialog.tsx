@@ -27,7 +27,7 @@ const NotifDialog = () => {
 
   useEffect(() => {
     handleClose();
-  }, []); // depend on curPage to refresh when page change
+  }, []);
 
   return (
     <Dialog
@@ -44,6 +44,22 @@ const NotifDialog = () => {
       </DialogActions>
     </Dialog>
   );
+
+  // return success ? (
+  //   <Dialog
+  //     open={open}
+  //     onClose={handleClose}
+  //     aria-labelledby="alert-dialog-title"
+  //     aria-describedby="alert-dialog-description"
+  //   >
+  //     <DialogTitle id="alert-dialog-title" sx={{ fontWeight: "bold" }}>
+  //       {message}
+  //     </DialogTitle>
+  //     <DialogActions>
+  //       <Button onClick={handleClose}>Close</Button>
+  //     </DialogActions>
+  //   </Dialog>
+  // ) : null;
 };
 
 export default NotifDialog;

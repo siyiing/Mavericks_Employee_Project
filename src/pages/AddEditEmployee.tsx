@@ -30,10 +30,6 @@ const AddEditEmployee = () => {
   const dispatch = useAppDispatch();
   const location = useLocation();
 
-  dispatch(
-    notificationDialogActions.setLocation({ location: location.pathname })
-  );
-
   const [name, setName] = useState<string>("");
   const [dept, setDept] = useState<string>("");
   const [salary, setSalary] = useState<number>(0);
@@ -45,6 +41,12 @@ const AddEditEmployee = () => {
 
   const editEmp = location.state?.employees;
   const curEmp = editEmp;
+
+  useEffect(() => {
+    dispatch(
+      notificationDialogActions.setLocation({ location: location.pathname })
+    );
+  }, []);
 
   useEffect(() => {
     if (location.pathname === "/editemployee" && editEmp) {

@@ -17,27 +17,18 @@ import NotifDialog from "./NotifDialog";
 import { notificationDialogActions } from "../store/features/notificationDialogSlice";
 import { deleteDialogActions } from "../store/features/deleteDialogSlice";
 import { employeeFormActions } from "../store/features/employeeFormSlice";
-import { paginationAction } from "../store/features/paginationSlice";
 
 const EmployeeList = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const fetchedEmployees = useAppSelector((state) => state.employee.employees);
   const [error, setError] = useState<string | null>(null);
+  const [empList, setEmpList] = useState<EmployeeI[]>([]);
 
-  // PAGINATION
-  const count = fetchedEmployees.length;
-  dispatch(
-    notificationDialogActions.setLocation({ location: location.pathname })
-  );
-  dispatch(employeeAction.setTotalCount({ totalCount: count }));
+  const fetchedEmployees = useAppSelector((state) => state.employee.employees);
   const curPage = useAppSelector((state) => state.pagination.curPage);
   const itemPerPage = useAppSelector((state) => state.pagination.itemPerPage);
-  console.log(count);
-
-  const [empList, setEmpList] = useState<EmployeeI[]>([]);
 
   // DELETE DIALOG
   const handleDeleteClickOpen = (emp: EmployeeI) => {
@@ -57,8 +48,7 @@ const EmployeeList = () => {
 
   useEffect(() => {
     fetchEmployee();
-    dispatch(paginationAction.setCurPage({ curPage: curPage }));
-    console.log("count", count);
+    // dispatch(paginationAction.setCurPage({ curPage: curPage }));
   }, []); // depend on curPage to refresh when page change
 
   // useEffect(() => {
@@ -66,6 +56,13 @@ const EmployeeList = () => {
   // }, [fetchedEmployees]); // depend on curPage to refresh when page change
 
   useEffect(() => {
+    dispatch(
+      notificationDialogActions.setLocation({ location: location.pathname })
+    );
+    dispatch(
+      employeeAction.setTotalCount({ totalCount: fetchedEmployees.length })
+    );
+
     const sortedEmployees = [...fetchedEmployees].sort(
       (a, b) => (a.id || 0) - (b.id || 0)
     ); // sort employees by id in ascending order
@@ -87,7 +84,7 @@ const EmployeeList = () => {
           <Typography color="error" variant="h6" sx={{ textAlign: "center" }}>
             {error}
           </Typography>
-        ) : count === 0 ? (
+        ) : fetchedEmployees.length === 0 ? (
           <Typography color="error" variant="h6" sx={{ textAlign: "center" }}>
             {"No Existing Employee"}
           </Typography>

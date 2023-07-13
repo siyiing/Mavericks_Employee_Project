@@ -7,7 +7,6 @@ import { deleteEmployeeThunk } from "../store/features/employeeThunk";
 import { useAppSelector, useAppDispatch } from "../store/hook";
 import { notificationDialogActions } from "../store/features/notificationDialogSlice";
 import { deleteDialogActions } from "../store/features/deleteDialogSlice";
-import { paginationAction } from "../store/features/paginationSlice";
 
 const DeleteDialog = ({
   refreshEmployees,
