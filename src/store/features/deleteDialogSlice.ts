@@ -17,7 +17,7 @@ export const deleteDialogSlice = createSlice({
   name: 'delete-dialog', 
   initialState,
   reducers: { 
-    setOpen
+    setOpen,
   }, 
 })
 

@@ -7,6 +7,7 @@ import { deleteEmployeeThunk } from "../store/features/employeeThunk";
 import { useAppSelector, useAppDispatch } from "../store/hook";
 import { notificationDialogActions } from "../store/features/notificationDialogSlice";
 import { deleteDialogActions } from "../store/features/deleteDialogSlice";
+import { employeeFormActions } from "../store/features/employeeFormSlice";
 
 const DeleteDialog = ({
   refreshEmployees,
@@ -21,16 +22,15 @@ const DeleteDialog = ({
   const handleDeleteClickClose = () => {
     dispatch(deleteDialogActions.setOpen({ open: false }));
     dispatch(notificationDialogActions.setOpen({ open: true }));
+    dispatch(employeeFormActions.setSuccess({ success: false }));
+    dispatch(notificationDialogActions.setMessage({ message: "" }));
   };
 
   const deleteEmployee = async (id: number) => {
     try {
       await dispatch(deleteEmployeeThunk(id));
-      dispatch(
-        notificationDialogActions.setMessage({
-          message: "delete successfully.",
-        })
-      );
+      dispatch(employeeFormActions.setSuccess({ success: true }));
+      dispatch(notificationDialogActions.setMessage({message: "delete successfully.",}));
       refreshEmployees();
     } catch (e) {
       console.error(e);

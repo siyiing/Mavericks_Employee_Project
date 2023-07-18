@@ -1,4 +1,4 @@
-import { useState } from "react";
+  import { useState } from "react";
 import {
   Box,
   TextField,
@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import Item from "@mui/material/Grid";
 import { Department, EmployeeI } from "../store/features/employeeSlice";
-import classes from "../styles/addemployee.module.css";
+import classes from "../styles/form.module.css";
 import { useAppDispatch } from "../store/hook";
 import {
   createEmployeeThunk,
@@ -87,14 +87,18 @@ const AddEditEmployee = () => {
 
   const validateForm = () => {
     let isValid = true;
+    const regex = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,<>\/?~]/;
 
     if (/\d/.test(name)) {
       setNameError("name should not contain numeric values");
       isValid = false;
-    } else if (name.length < 4 || name.length > 30) {
+    } else if (name.length < 4 || name.length > 30 || name.trim().length === 0) {
       setNameError(
         "name should be at least 4 characters and not exceed 30 characters"
       );
+      isValid = false;
+    } else if (regex.test(name)) {
+      setNameError("name should not contain special characters");
       isValid = false;
     } else {
       setNameError("");
@@ -121,6 +125,7 @@ const AddEditEmployee = () => {
 
   const handleDialogOpen = () => {
     dispatch(notificationDialogActions.setOpen({ open: true }));
+    dispatch(employeeFormActions.setSuccess({ success: false }));
 
     if (modeTitle === "Insert New Employee") handleInsertButton();
     else if (modeTitle === "Update Employee Details") handleUpdateButton();
@@ -133,16 +138,10 @@ const AddEditEmployee = () => {
       const emp = { name, department: edept, salary };
       insertEmployee(emp);
       dispatch(employeeFormActions.setSuccess({ success: true }));
-      dispatch(
-        notificationDialogActions.setMessage({
-          message: "insert sucessfully !",
-        })
-      );
+      dispatch(notificationDialogActions.setMessage({message: "insert sucessfully !",}));
     } else {
       dispatch(employeeFormActions.setSuccess({ success: false }));
-      dispatch(
-        notificationDialogActions.setMessage({ message: "fail to insert." })
-      );
+      dispatch(notificationDialogActions.setMessage({ message: "fail to insert." }));
     }
   };
 
@@ -158,25 +157,15 @@ const AddEditEmployee = () => {
         emp.salary === curEmp.salary
       ) {
         dispatch(employeeFormActions.setSuccess({ success: false }));
-        dispatch(
-          notificationDialogActions.setMessage({
-            message: "Update failed. No changes made.",
-          })
-        );
+        dispatch(notificationDialogActions.setMessage({message: "Update failed. No changes made."}));
       } else {
         updateEmployee(emp);
         dispatch(employeeFormActions.setSuccess({ success: true }));
-        dispatch(
-          notificationDialogActions.setMessage({
-            message: "updated successfully.",
-          })
-        );
+        dispatch(notificationDialogActions.setMessage({message: "updated successfully."}));
       }
     } else {
       dispatch(employeeFormActions.setSuccess({ success: false }));
-      dispatch(
-        notificationDialogActions.setMessage({ message: "failed to update." })
-      );
+      dispatch(notificationDialogActions.setMessage({ message: "failed to update." }));
     }
   };
 

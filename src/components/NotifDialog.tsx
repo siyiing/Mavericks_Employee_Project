@@ -6,6 +6,7 @@ import { useAppSelector, useAppDispatch } from "../store/hook";
 import { notificationDialogActions } from "../store/features/notificationDialogSlice";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { userActions } from "../store/features/userSlice";
 
 const NotifDialog = () => {
   const dispatch = useAppDispatch();
@@ -14,6 +15,8 @@ const NotifDialog = () => {
   const message = useAppSelector((state) => state.notificationdialog.message);
   const location = useAppSelector((state) => state.notificationdialog.location);
   const success = useAppSelector((state) => state.employeeform.success);
+  const signupSuccess = useAppSelector((state) => state.user.signup_success);
+  const loginSuccess = useAppSelector((state) => state.user.login_success);
 
   const handleClose = () => {
     dispatch(notificationDialogActions.setOpen({ open: false }));
@@ -22,14 +25,18 @@ const NotifDialog = () => {
       (location === "/addemployee" || location === "/editemployee") &&
       success
     )
-      navigate("/");
+      navigate("/employeelist");
+
+    if (location === "/signup" && signupSuccess) navigate("/login");
+
+    if (location === "/login" && loginSuccess) navigate("/employeelist");
   };
 
   useEffect(() => {
     handleClose();
   }, []);
 
-  return (
+  return message !== "" ? (
     <Dialog
       open={open}
       onClose={handleClose}
@@ -43,23 +50,7 @@ const NotifDialog = () => {
         <Button onClick={handleClose}>Close</Button>
       </DialogActions>
     </Dialog>
-  );
-
-  // return success ? (
-  //   <Dialog
-  //     open={open}
-  //     onClose={handleClose}
-  //     aria-labelledby="alert-dialog-title"
-  //     aria-describedby="alert-dialog-description"
-  //   >
-  //     <DialogTitle id="alert-dialog-title" sx={{ fontWeight: "bold" }}>
-  //       {message}
-  //     </DialogTitle>
-  //     <DialogActions>
-  //       <Button onClick={handleClose}>Close</Button>
-  //     </DialogActions>
-  //   </Dialog>
-  // ) : null;
+  ) : null;
 };
 
 export default NotifDialog;

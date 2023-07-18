@@ -14,6 +14,17 @@ export const fetchAllEmployeesThunk = createAsyncThunk(
     }
 })
 
+export const fetchEmployeesByDeptIdThunk = createAsyncThunk( 
+    "employee/fetchEmployeesByDeptId", async(departmentId: number) => {
+    try {
+       const response = await axios.get<any>(url + "s/" + departmentId);
+       return response.data;
+    } catch (e: any) {
+        return e.response.data;
+    }
+})
+
+
 export const createEmployeeThunk = createAsyncThunk(
     "employee/createEmployee", async(employee: {name:string, department: Department, salary:number}) => {
         try {

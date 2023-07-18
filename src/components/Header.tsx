@@ -1,12 +1,11 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import AddEmployeeBtn from "./AddEmployeeBtn";
-import BackToHomeBtn from "./BackToHomeBtn";
+import BackBtn from "./BackBtn";
 import { Box, AppBar, Toolbar, Typography } from "@mui/material";
+import LogOutBtn from "./LogOutBtn";
 
 const Header = () => {
   const location = useLocation();
-  const navigate = useNavigate();
-
   return (
     <>
       <Box sx={{ height: 75 }}>
@@ -19,16 +18,23 @@ const Header = () => {
                 fontSize: "1.5rem",
                 color: "#ffffff",
               }}
-              onClick={() => navigate("/")}
+              // onClick={() => navigate("/")}
             >
               Employees
             </Typography>
-
             {location.pathname === "/addemployee" ||
             location.pathname === "/editemployee" ? (
-              <BackToHomeBtn />
-            ) : (
-              <AddEmployeeBtn />
+              <>
+                <BackBtn />
+                <LogOutBtn />
+              </>
+            ) : location.pathname === "/signup" ? (
+              <BackBtn />
+            ) : location.pathname === "/login" ? null : (
+              <>
+                <AddEmployeeBtn />
+                <LogOutBtn />
+              </>
             )}
           </Toolbar>
         </AppBar>

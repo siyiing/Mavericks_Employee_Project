@@ -7,7 +7,10 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useAppSelector, useAppDispatch } from "../store/hook";
 import { Box, Grid } from "@mui/material";
 import Item from "@mui/material/Grid";
-import { fetchAllEmployeesThunk } from "../store/features/employeeThunk";
+import {
+  fetchAllEmployeesThunk,
+  fetchEmployeesByDeptIdThunk,
+} from "../store/features/employeeThunk";
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import DeleteDialog from "./DeleteDialog";
@@ -29,31 +32,36 @@ const EmployeeList = () => {
   const fetchedEmployees = useAppSelector((state) => state.employee.employees);
   const curPage = useAppSelector((state) => state.pagination.curPage);
   const itemPerPage = useAppSelector((state) => state.pagination.itemPerPage);
+  const fetchedUser = useAppSelector((state) => state.user.user);
 
-  // DELETE DIALOG
   const handleDeleteClickOpen = (emp: EmployeeI) => {
     dispatch(employeeFormActions.setEmployeeData({ empData: emp }));
     dispatch(deleteDialogActions.setOpen({ open: true }));
   };
 
-  // FETCH FROM SERVER
   const fetchEmployee = async () => {
     try {
-      await dispatch(fetchAllEmployeesThunk()).unwrap(); // unwrap helps to tell me which status it is
+      await dispatch(
+        fetchEmployeesByDeptIdThunk(fetchedUser.departmentId)
+      ).unwrap();
     } catch (e) {
       setError("Something is wrong.. Cannot connect to server.");
       console.error(e);
     }
   };
 
+  // const fetchEmployee = async () => {
+  //   try {
+  //     await dispatch(fetchAllEmployeesThunk()).unwrap(); // unwrap helps to tell me which status it is
+  //   } catch (e) {
+  //     setError("Something is wrong.. Cannot connect to server.");
+  //     console.error(e);
+  //   }
+  // };
+
   useEffect(() => {
     fetchEmployee();
-    // dispatch(paginationAction.setCurPage({ curPage: curPage }));
   }, []); // depend on curPage to refresh when page change
-
-  // useEffect(() => {
-  //   fetchEmployee();
-  // }, [fetchedEmployees]); // depend on curPage to refresh when page change
 
   useEffect(() => {
     dispatch(
@@ -62,6 +70,7 @@ const EmployeeList = () => {
     dispatch(
       employeeAction.setTotalCount({ totalCount: fetchedEmployees.length })
     );
+    dispatch(employeeFormActions.setSuccess({ success: false }));
 
     const sortedEmployees = [...fetchedEmployees].sort(
       (a, b) => (a.id || 0) - (b.id || 0)
