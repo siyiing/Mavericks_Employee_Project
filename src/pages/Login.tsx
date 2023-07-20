@@ -2,18 +2,20 @@ import { Box, TextField, Container, Grid, Button } from "@mui/material";
 import Item from "@mui/material/Grid";
 import { useAppDispatch } from "../store/hook";
 import NotifDialog from "../components/NotifDialog";
-import { fetchUserByUsernameThunk } from "../store/features/userThunk";
+import {
+  loginUserThunk
+} from "../store/features/userThunk";  // fetchUserByUsernameThunk
 import classes from "../styles/form.module.css";
 import { useEffect, useState } from "react";
 import { userActions } from "../store/features/userSlice";
 import { notificationDialogActions } from "../store/features/notificationDialogSlice";
 import { useLocation, useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const Login = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const bcrypt = require("bcryptjs");
 
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -29,6 +31,17 @@ const Login = () => {
     dispatch(userActions.setLoginSuccess({ success: false }));
     dispatch(notificationDialogActions.setMessage({ message: "" }));
   }, []);
+
+  const deleteCookie = () => {
+    console.log("clearing cookie");
+    Cookies.remove("token");
+    console.log("cleared cookie");
+    console.log("get cookie", Cookies.get("token"));
+  };
+
+  useEffect(() => {
+    deleteCookie();
+  }, [deleteCookie]);
 
   const validateForm = () => {
     let isValid = true;
@@ -53,44 +66,78 @@ const Login = () => {
   const fetchUser = async () => {
     try {
       if (validateForm()) {
-        const response = await dispatch(
-          fetchUserByUsernameThunk(username)
-        ).unwrap();
-        // dispatch(notificationDialogActions.setMessage({ message: "" }));
+        const user = { username, password };
+        const response = await dispatch(loginUserThunk(user)).unwrap(); // get obj
+        console.log("the response", response.message);
 
         // do not exist
-        if (response.username == undefined) {
-          setUsernameError("user not found");
-          dispatch(userActions.setLoginSuccess({ success: false }));
-          // dispatch(notificationDialogActions.setMessage({message: "login failed !"}));
-        } else {
-          const passwordMatch = await bcrypt.compare(
-            password,
-            response.password
+        if (response.requestState === 1) {
+          dispatch(userActions.setLoginSuccess({ success: true }));
+          dispatch(
+            notificationDialogActions.setMessage({
+              message: "logged in sucessfully!",
+            })
           );
-          if (passwordMatch) {
-            dispatch(userActions.setUserData({ userData: response }));
-            dispatch(userActions.setLoginSuccess({ success: true }));
-            dispatch(
-              notificationDialogActions.setMessage({
-                message: "logged in sucessfully!",
-              })
-            );
-          } else {  
+        } else {
+          // requeststate = 0
+          if (response.message === "user not found") {
+            setUsernameError("user not found");
+            dispatch(userActions.setLoginSuccess({ success: false }));
+          } else if (response.message === "password incorrect") {
             setPasswordError("incorrect password");
             dispatch(userActions.setLoginSuccess({ success: false }));
-            // dispatch(notificationDialogActions.setMessage({ message: "login failed !"}));
+          } else {
+            // authentication fail
           }
         }
-      } else {
-        dispatch(userActions.setLoginSuccess({ success: false }));
-        // dispatch(notificationDialogActions.setMessage({ message: "login failed !" }));
       }
     } catch (e) {
       // setError("Something is wrong.. Cannot connect to server.");
       console.error(e);
     }
   };
+
+  // const fetchUser = async () => {
+  //   try {
+  //     if (validateForm()) {
+  //       const response = await dispatch(
+  //         fetchUserByUsernameThunk(username)
+  //       ).unwrap();
+  //       // dispatch(notificationDialogActions.setMessage({ message: "" }));
+
+  //       // do not exist
+  //       if (response.username == undefined) {
+  //         setUsernameError("user not found");
+  //         dispatch(userActions.setLoginSuccess({ success: false }));
+  //         // dispatch(notificationDialogActions.setMessage({message: "login failed !"}));
+  //       } else {
+  //         const passwordMatch = await bcrypt.compare(
+  //           password,
+  //           response.password
+  //         );
+  //         if (passwordMatch) {
+  //           dispatch(userActions.setUserData({ userData: response }));
+  //           dispatch(userActions.setLoginSuccess({ success: true }));
+  //           dispatch(
+  //             notificationDialogActions.setMessage({
+  //               message: "logged in sucessfully!",
+  //             })
+  //           );
+  //         } else {
+  //           setPasswordError("incorrect password");
+  //           dispatch(userActions.setLoginSuccess({ success: false }));
+  //           // dispatch(notificationDialogActions.setMessage({ message: "login failed !"}));
+  //         }
+  //       }
+  //     } else {
+  //       dispatch(userActions.setLoginSuccess({ success: false }));
+  //       // dispatch(notificationDialogActions.setMessage({ message: "login failed !" }));
+  //     }
+  //   } catch (e) {
+  //     // setError("Something is wrong.. Cannot connect to server.");
+  //     console.error(e);
+  //   }
+  // };
 
   const handleGoSignUpButton = () => {
     navigate("/signup");

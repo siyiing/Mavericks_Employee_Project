@@ -7,7 +7,7 @@ const url = "http://localhost:5000/employee";
 export const fetchAllEmployeesThunk = createAsyncThunk( 
     "employee/fetchAllEmployees", async() => {
     try {
-       const response = await axios.get<any>(url); 
+       const response = await axios.get<any>(url, {withCredentials: true}); 
        return response.data;
     } catch (e: any) {
         return e.response.data;

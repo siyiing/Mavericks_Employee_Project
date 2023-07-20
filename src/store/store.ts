@@ -4,7 +4,7 @@ import { paginationSlice } from "./features/paginationSlice";
 import { employeeFormSlice } from "./features/employeeFormSlice";
 import { notificationDialogSlice } from "./features/notificationDialogSlice";
 import { deleteDialogSlice } from "./features/deleteDialogSlice";
-import { userSlice} from "./features/userSlice";
+import { userSlice } from "./features/userSlice";
 
 // used to create store to export it 
 export const store = configureStore({

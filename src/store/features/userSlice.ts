@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { RootState } from "../store";
-import { createUserThunk, fetchUserByUsernameThunk } from "./userThunk";
+import { createUserThunk, loginUserThunk } from "./userThunk"; // fetchUserByUsernameThunk
 
 export interface UserI {
     username: string;
@@ -22,9 +22,9 @@ const initialState: UserState = {
     login_success: false
 }
 
-const setUserData = (state: UserState, action: PayloadAction<{userData: UserI}>) => {
-  state.user = action.payload.userData;
-} 
+// const setUserData = (state: UserState, action: PayloadAction<{userData: UserI}>) => {
+//   state.user = action.payload.userData;
+// } 
 
 const setSignUpSuccess = (state: UserState, action: PayloadAction<{success:boolean}>) => {
   state.signup_success = action.payload.success;
@@ -38,23 +38,23 @@ export const userSlice = createSlice({
   name: 'user', 
   initialState,
   reducers: { 
-    setUserData, 
+    // setUserData, 
     setSignUpSuccess,
     setLoginSuccess
   },
   extraReducers:(builders) => {
     builders 
-    .addCase(fetchUserByUsernameThunk.pending, (state) => { 
-      state.isLoading = true;
-    })
-    .addCase(fetchUserByUsernameThunk.fulfilled, (state, action) => { 
-      state.user = action.payload;
-      state.isLoading = false;
-    })
-    .addCase(fetchUserByUsernameThunk.rejected, (state) => { 
-      state.user = initialState.user; 
-      state.isLoading = false;
-    })
+    // .addCase(fetchUserByUsernameThunk.pending, (state) => { 
+    //   state.isLoading = true;
+    // })
+    // .addCase(fetchUserByUsernameThunk.fulfilled, (state, action) => { 
+    //   state.user = action.payload;
+    //   state.isLoading = false;
+    // })
+    // .addCase(fetchUserByUsernameThunk.rejected, (state) => { 
+    //   state.user = initialState.user; 
+    //   state.isLoading = false;
+    // })
     .addCase(createUserThunk.pending, (state) => { 
       state.isLoading = true;
     })
@@ -62,6 +62,16 @@ export const userSlice = createSlice({
       state.isLoading = false;
     })
     .addCase(createUserThunk.rejected, (state) => { 
+      state.user = initialState.user; 
+      state.isLoading = false;
+    })
+    .addCase(loginUserThunk.pending, (state) => { 
+      state.isLoading = true;
+    })
+    .addCase(loginUserThunk.fulfilled, (state) => { 
+      state.isLoading = false;
+    })
+    .addCase(loginUserThunk.rejected, (state) => { 
       state.user = initialState.user; 
       state.isLoading = false;
     })

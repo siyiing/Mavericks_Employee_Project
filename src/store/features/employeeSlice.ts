@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { createEmployeeThunk, deleteEmployeeThunk, fetchAllEmployeesThunk, updateEmployeeThunk, fetchEmployeesByDeptIdThunk } from "./employeeThunk";
 import { RootState } from "../store";
+import { stat } from "fs";
 
 export enum Department { HR='HR', PS='PS'};
 
@@ -23,6 +24,10 @@ const initialState: EmployeeState = {
   totalCount: 0
 }
 
+// const setEmpData = (state: EmployeeState, action: PayloadAction<{totalCount: number}>) => {
+//   state.totalCount = action.payload.totalCount;
+// } 
+
 const setTotalCount = (state: EmployeeState, action: PayloadAction<{totalCount: number}>) => {
   state.totalCount = action.payload.totalCount;
 } 
@@ -40,6 +45,7 @@ export const employeeSlice = createSlice({
     })
     .addCase(fetchAllEmployeesThunk.fulfilled, (state, action) => { // successfully obtained a response 
       state.employees = action.payload;
+      console.log('state.employee', state.employees)
       state.isLoading = false;
     })
     .addCase(fetchAllEmployeesThunk.rejected, (state) => { // failed to receive a response 

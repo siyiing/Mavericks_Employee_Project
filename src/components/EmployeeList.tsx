@@ -20,6 +20,7 @@ import NotifDialog from "./NotifDialog";
 import { notificationDialogActions } from "../store/features/notificationDialogSlice";
 import { deleteDialogActions } from "../store/features/deleteDialogSlice";
 import { employeeFormActions } from "../store/features/employeeFormSlice";
+// import { reject } from "q";
 
 const EmployeeList = () => {
   const dispatch = useAppDispatch();
@@ -32,36 +33,52 @@ const EmployeeList = () => {
   const fetchedEmployees = useAppSelector((state) => state.employee.employees);
   const curPage = useAppSelector((state) => state.pagination.curPage);
   const itemPerPage = useAppSelector((state) => state.pagination.itemPerPage);
-  const fetchedUser = useAppSelector((state) => state.user.user);
 
   const handleDeleteClickOpen = (emp: EmployeeI) => {
     dispatch(employeeFormActions.setEmployeeData({ empData: emp }));
     dispatch(deleteDialogActions.setOpen({ open: true }));
   };
 
-  const fetchEmployee = async () => {
-    try {
-      await dispatch(
-        fetchEmployeesByDeptIdThunk(fetchedUser.departmentId)
-      ).unwrap();
-    } catch (e) {
-      setError("Something is wrong.. Cannot connect to server.");
-      console.error(e);
-    }
-  };
+  // THIS IS TO FETCH EMPLOYEE BY THE LOGGED IN DEPARTMENT ID
 
   // const fetchEmployee = async () => {
   //   try {
-  //     await dispatch(fetchAllEmployeesThunk()).unwrap(); // unwrap helps to tell me which status it is
+  //     await dispatch(
+  //       fetchEmployeesByDeptIdThunk(fetchedUser.departmentId)
+  //     ).unwrap();
   //   } catch (e) {
   //     setError("Something is wrong.. Cannot connect to server.");
   //     console.error(e);
   //   }
   // };
 
+  // THIS FETCH ALL WITHOUT FILTERING
+  const fetchEmployee = async () => {
+    try {
+      const response = await dispatch(fetchAllEmployeesThunk()).unwrap(); // unwrap helps to tell me which status it is
+
+      if (response.requestState === 0) {
+        setError("A token is required for authentication");
+        // throw new Error("A token is required for authentication");
+      }
+      Promise.resolve();
+    } catch (e) {
+      setError("Something is wrong.. Cannot connect to server.");
+      console.error(e);
+      // Promise.reject(e);
+    }
+  };
+
+  // useEffect(() => {
+  //   fetchEmployee().catch((e) => {
+  //     setError(e);
+  //   });
+  // }, []); // depend on curPage to refresh when page change
+
   useEffect(() => {
     fetchEmployee();
   }, []); // depend on curPage to refresh when page change
+
 
   useEffect(() => {
     dispatch(
@@ -72,12 +89,16 @@ const EmployeeList = () => {
     );
     dispatch(employeeFormActions.setSuccess({ success: false }));
 
-    const sortedEmployees = [...fetchedEmployees].sort(
-      (a, b) => (a.id || 0) - (b.id || 0)
-    ); // sort employees by id in ascending order
-    const startItem = (curPage - 1) * itemPerPage;
-    const endItem = startItem + itemPerPage;
-    setEmpList(sortedEmployees.slice(startItem, endItem));
+    if (fetchedEmployees) {
+      const sortedEmployees = [...fetchedEmployees].sort(
+        (a, b) => (a.id || 0) - (b.id || 0)
+      ); // sort employees by id in ascending order
+      const startItem = (curPage - 1) * itemPerPage;
+      const endItem = startItem + itemPerPage;
+      setEmpList(sortedEmployees.slice(startItem, endItem));
+    } else {
+      setEmpList([]);
+    }
   }, [curPage, fetchedEmployees]); // slice the list anytime the page or the full list is updated
 
   return (

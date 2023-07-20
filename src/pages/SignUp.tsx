@@ -17,22 +17,18 @@ import {
 import Item from "@mui/material/Grid";
 import { useAppDispatch } from "../store/hook";
 import NotifDialog from "../components/NotifDialog";
-import {
-  createUserThunk,
-  fetchUserByUsernameThunk,
-} from "../store/features/userThunk";
+import { createUserThunk } from "../store/features/userThunk"; // fetchUserByUsernameThunk
 import classes from "../styles/form.module.css";
 import { useState, useEffect } from "react";
 import { UserI, userActions } from "../store/features/userSlice";
 import { notificationDialogActions } from "../store/features/notificationDialogSlice";
 import { useLocation } from "react-router-dom";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
+// import Visibility from "@mui/icons-material/Visibility";
+// import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 const SignUp = () => {
   const dispatch = useAppDispatch();
   const location = useLocation();
-  const bcrypt = require("bcryptjs"); // for password hashing
 
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -43,8 +39,8 @@ const SignUp = () => {
   const [rePasswordError, setRePasswordError] = useState<string>("");
   const [deptError, setDeptError] = useState<string>("");
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showRePassword, setShowRePassword] = useState(false);
+  // const [showPassword, setShowPassword] = useState(false);
+  // const [showRePassword, setShowRePassword] = useState(false);
   const [buttonClicked, setButtonClicked] = useState(false);
 
   useEffect(() => {
@@ -53,22 +49,22 @@ const SignUp = () => {
     );
   }, []);
 
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
-  const handleClickShowRePassword = () => setShowRePassword((show) => !show);
+  // const handleClickShowPassword = () => setShowPassword((show) => !show);
+  // const handleClickShowRePassword = () => setShowRePassword((show) => !show);
 
-  const handleMouseDownPassword = (
-    event: React.MouseEvent<HTMLButtonElement>
-  ) => {
-    event.preventDefault();
-  };
+  // const handleMouseDownPassword = (
+  //   event: React.MouseEvent<HTMLButtonElement>
+  // ) => {
+  //   event.preventDefault();
+  // };
 
-  const insertUser = async (user: UserI) => {
-    try {
-      await dispatch(createUserThunk(user)).unwrap();
-    } catch (e) {
-      console.error(e);
-    }
-  };
+  // const insertUser = async (user: UserI) => {
+  //   try {
+  //     const response = await dispatch(createUserThunk(user)).unwrap();
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // };
 
   const handleDeptChange = (event: SelectChangeEvent<typeof departmentId>) => {
     setDept(+event.target.value);
@@ -126,16 +122,14 @@ const SignUp = () => {
 
   const handleInsertButton = async () => {
     setButtonClicked(true);
-    if (validateForm()) {
-      // find if username exist to avoid duplication
-      const response = await dispatch(
-        fetchUserByUsernameThunk(username)
-      ).unwrap();
+    let response: any;
 
-      if (response.username !== username) {
-        const hashedPW = await bcrypt.hash(password, 12);
-        const user = { username, password: hashedPW, departmentId };
-        insertUser(user);
+    if (validateForm()) {
+      // create user
+      const user = { username, password: password, departmentId };
+      response = await dispatch(createUserThunk(user)).unwrap();
+
+      if (response === "OK") {
         dispatch(userActions.setSignUpSuccess({ success: true }));
         dispatch(
           notificationDialogActions.setMessage({
@@ -143,14 +137,42 @@ const SignUp = () => {
           })
         );
       } else {
-        dispatch(userActions.setSignUpSuccess({ success: false }));
+        // error
+        if (response === "Bad Request")
+          dispatch(userActions.setSignUpSuccess({ success: false }));
         setUsernameError("username already exist");
       }
     } else {
       dispatch(userActions.setSignUpSuccess({ success: false }));
-      // dispatch(notificationDialogActions.setMessage({message: "fail to create user."}));
     }
   };
+
+  // const handleInsertButton = async () => {
+  //   setButtonClicked(true);
+  //   if (validateForm()) {
+  //     // find if username exist to avoid duplication
+  //     const response = await dispatch(
+  //       fetchUserByUsernameThunk(username)
+  //     ).unwrap();
+
+  //     if (response.username !== undefined && response.username !== username) {
+  //       const user = { username, password: password, departmentId };
+  //       insertUser(user);
+  //       dispatch(userActions.setSignUpSuccess({ success: true }));
+  //       dispatch(
+  //         notificationDialogActions.setMessage({
+  //           message: "user created sucessfully !",
+  //         })
+  //       );
+  //     } else { // is undefined or username exist
+  //       dispatch(userActions.setSignUpSuccess({ success: false }));
+  //       setUsernameError("username already exist");
+  //     }
+  //   } else { // else for validate form
+  //     dispatch(userActions.setSignUpSuccess({ success: false }));
+  //     // dispatch(notificationDialogActions.setMessage({message: "fail to create user."}));
+  //   }
+  // };
 
   return (
     <div className={classes.main_grid}>

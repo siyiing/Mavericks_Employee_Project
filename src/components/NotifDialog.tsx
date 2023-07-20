@@ -29,7 +29,9 @@ const NotifDialog = () => {
 
     if (location === "/signup" && signupSuccess) navigate("/login");
 
-    if (location === "/login" && loginSuccess) navigate("/employeelist");
+    if (location === "/login" && loginSuccess) {
+      navigate("/employeelist");
+    }
   };
 
   useEffect(() => {

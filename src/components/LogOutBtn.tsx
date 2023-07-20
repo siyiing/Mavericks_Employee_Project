@@ -9,6 +9,11 @@ const LogOutBtn = () => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const handleLogout = () => {
+    navigate("/login")
+  }
+
+
   return (
     <div>
       <Button
@@ -17,7 +22,7 @@ const LogOutBtn = () => {
         size="medium"
         startIcon={<LogoutIcon />}
         sx={{ marginLeft: "10px" }}
-        onClick={() => navigate("/login")}
+        onClick={handleLogout}
       >
         {!isSmallScreen && "Log Out"}
       </Button>

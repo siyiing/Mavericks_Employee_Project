@@ -30,7 +30,8 @@ const Header = () => {
               </>
             ) : location.pathname === "/signup" ? (
               <BackBtn />
-            ) : location.pathname === "/login" ? null : (
+            ) : location.pathname === "/login" ||
+              location.pathname === "/" ? null : (
               <>
                 <AddEmployeeBtn />
                 <LogOutBtn />

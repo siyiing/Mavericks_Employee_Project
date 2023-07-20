@@ -23,4 +23,4 @@ export const deleteDialogSlice = createSlice({
 
 export const deleteDialogActions = deleteDialogSlice.actions;
 export default deleteDialogSlice.reducer;
-export const NoitifcationDialogState = (state: RootState) => state.deletedialog;
+export const DeleteDialogState = (state: RootState) => state.deletedialog;
