@@ -30,17 +30,6 @@ const Login = () => {
     dispatch(notificationDialogActions.setMessage({ message: "" }));
   }, []);
 
-  // const deleteCookie = () => {
-  //   console.log("clearing cookie");
-  //   Cookies.remove("token");
-  //   console.log("cleared cookie");
-  //   console.log("get cookie", Cookies.get("token"));
-  // };
-
-  // useEffect(() => {
-  //   deleteCookie();
-  // }, [deleteCookie]);
-
   const validateForm = () => {
     let isValid = true;
 
@@ -97,6 +86,7 @@ const Login = () => {
   };
 
   const handleGoSignUpButton = () => {
+    console.log('go sign up')
     navigate("/signup");
   };
 

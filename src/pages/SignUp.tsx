@@ -17,7 +17,7 @@ import {
 import Item from "@mui/material/Grid";
 import { useAppDispatch } from "../store/hook";
 import NotifDialog from "../components/NotifDialog";
-import { createUserThunk } from "../store/features/userThunk"; // fetchUserByUsernameThunk
+import { createUserThunk } from "../store/features/userThunk";
 import classes from "../styles/form.module.css";
 import { useState, useEffect } from "react";
 import { UserI, userActions } from "../store/features/userSlice";
@@ -44,6 +44,7 @@ const SignUp = () => {
   const [buttonClicked, setButtonClicked] = useState(false);
 
   useEffect(() => {
+    
     dispatch(
       notificationDialogActions.setLocation({ location: location.pathname })
     );
@@ -56,14 +57,6 @@ const SignUp = () => {
   //   event: React.MouseEvent<HTMLButtonElement>
   // ) => {
   //   event.preventDefault();
-  // };
-
-  // const insertUser = async (user: UserI) => {
-  //   try {
-  //     const response = await dispatch(createUserThunk(user)).unwrap();
-  //   } catch (e) {
-  //     console.error(e);
-  //   }
   // };
 
   const handleDeptChange = (event: SelectChangeEvent<typeof departmentId>) => {
@@ -146,33 +139,6 @@ const SignUp = () => {
       dispatch(userActions.setSignUpSuccess({ success: false }));
     }
   };
-
-  // const handleInsertButton = async () => {
-  //   setButtonClicked(true);
-  //   if (validateForm()) {
-  //     // find if username exist to avoid duplication
-  //     const response = await dispatch(
-  //       fetchUserByUsernameThunk(username)
-  //     ).unwrap();
-
-  //     if (response.username !== undefined && response.username !== username) {
-  //       const user = { username, password: password, departmentId };
-  //       insertUser(user);
-  //       dispatch(userActions.setSignUpSuccess({ success: true }));
-  //       dispatch(
-  //         notificationDialogActions.setMessage({
-  //           message: "user created sucessfully !",
-  //         })
-  //       );
-  //     } else { // is undefined or username exist
-  //       dispatch(userActions.setSignUpSuccess({ success: false }));
-  //       setUsernameError("username already exist");
-  //     }
-  //   } else { // else for validate form
-  //     dispatch(userActions.setSignUpSuccess({ success: false }));
-  //     // dispatch(notificationDialogActions.setMessage({message: "fail to create user."}));
-  //   }
-  // };
 
   return (
     <div className={classes.main_grid}>
