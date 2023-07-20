@@ -4,20 +4,20 @@ import { Department } from "./employeeSlice";
 
 const url = "http://localhost:5000/employee";
 
-export const fetchAllEmployeesThunk = createAsyncThunk( 
-    "employee/fetchAllEmployees", async() => {
-    try {
-       const response = await axios.get<any>(url, {withCredentials: true}); 
-       return response.data;
-    } catch (e: any) {
-        return e.response.data;
-    }
-})
+// export const fetchAllEmployeesThunk = createAsyncThunk( 
+//     "employee/fetchAllEmployees", async() => {
+//     try {
+//        const response = await axios.get<any>(url, {withCredentials: true}); 
+//        return response.data;
+//     } catch (e: any) {
+//         return e.response.data;
+//     }
+// })
 
 export const fetchEmployeesByDeptIdThunk = createAsyncThunk( 
     "employee/fetchEmployeesByDeptId", async(departmentId: number) => {
     try {
-       const response = await axios.get<any>(url + "s/" + departmentId);
+       const response = await axios.get<any>(url + "s/" + departmentId, {withCredentials: true} );
        return response.data;
     } catch (e: any) {
         return e.response.data;

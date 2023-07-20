@@ -3,19 +3,39 @@ import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
+import { useAppDispatch, useAppSelector } from "../store/hook";
+import { userActions } from "../store/features/userSlice";
+import { logoutThunk } from "../store/features/userThunk";
+import { notificationDialogActions } from "../store/features/notificationDialogSlice";
+import NotifDialog from "./NotifDialog";
 
 const LogOutBtn = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const handleLogout = () => {
-    navigate("/login")
-  }
+  const token = useAppSelector((state) => state.user.authToken);
 
+  const handleLogout = async () => {
+    const response = await dispatch(logoutThunk(token)).unwrap();
+
+    if (response.success === 1) {
+      dispatch(notificationDialogActions.setOpen({ open: true }));
+      dispatch(userActions.setAuthToken({ token: "" }));
+      dispatch(
+        notificationDialogActions.setMessage({ message: "logout successfully" })
+      );
+    } else {
+      dispatch(
+        notificationDialogActions.setMessage({ message: "logout failed" })
+      );
+    }
+  };
 
   return (
-    <div>
+    <>
       <Button
         variant="contained"
         color="success"
@@ -26,7 +46,8 @@ const LogOutBtn = () => {
       >
         {!isSmallScreen && "Log Out"}
       </Button>
-    </div>
+      <NotifDialog />
+    </>
   );
 };
 

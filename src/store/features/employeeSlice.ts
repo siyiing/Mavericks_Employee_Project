@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
-import { createEmployeeThunk, deleteEmployeeThunk, fetchAllEmployeesThunk, updateEmployeeThunk, fetchEmployeesByDeptIdThunk } from "./employeeThunk";
+import { createEmployeeThunk, deleteEmployeeThunk, updateEmployeeThunk, fetchEmployeesByDeptIdThunk } from "./employeeThunk"; // fetchAllEmployeesThunk
 import { RootState } from "../store";
-import { stat } from "fs";
 
 export enum Department { HR='HR', PS='PS'};
 
@@ -39,19 +38,18 @@ export const employeeSlice = createSlice({
     setTotalCount,
   }, 
   extraReducers:(builders) => {
-    builders // 3 basic states = pending, fulfilled and rejected 
-    .addCase(fetchAllEmployeesThunk.pending, (state) => { // when making api request, waiting for response to come 
-      state.isLoading = true;
-    })
-    .addCase(fetchAllEmployeesThunk.fulfilled, (state, action) => { // successfully obtained a response 
-      state.employees = action.payload;
-      console.log('state.employee', state.employees)
-      state.isLoading = false;
-    })
-    .addCase(fetchAllEmployeesThunk.rejected, (state) => { // failed to receive a response 
-      state.employees = initialState.employees; // reset state to empty list 
-      state.isLoading = false;
-    })
+    builders 
+    // .addCase(fetchAllEmployeesThunk.pending, (state) => { 
+    //   state.isLoading = true;
+    // })
+    // .addCase(fetchAllEmployeesThunk.fulfilled, (state, action) => {
+    //   state.employees = action.payload;
+    //   state.isLoading = false;
+    // })
+    // .addCase(fetchAllEmployeesThunk.rejected, (state) => { 
+    //   state.employees = initialState.employees; 
+    //   state.isLoading = false;
+    // })
     .addCase(createEmployeeThunk.pending, (state) => { 
       state.isLoading = true;
     })

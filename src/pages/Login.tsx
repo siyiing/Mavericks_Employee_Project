@@ -2,15 +2,13 @@ import { Box, TextField, Container, Grid, Button } from "@mui/material";
 import Item from "@mui/material/Grid";
 import { useAppDispatch } from "../store/hook";
 import NotifDialog from "../components/NotifDialog";
-import {
-  loginUserThunk
-} from "../store/features/userThunk";  // fetchUserByUsernameThunk
+import { loginUserThunk } from "../store/features/userThunk";
 import classes from "../styles/form.module.css";
 import { useEffect, useState } from "react";
 import { userActions } from "../store/features/userSlice";
 import { notificationDialogActions } from "../store/features/notificationDialogSlice";
 import { useLocation, useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
+// import Cookies from "js-cookie";
 
 const Login = () => {
   const dispatch = useAppDispatch();
@@ -32,16 +30,16 @@ const Login = () => {
     dispatch(notificationDialogActions.setMessage({ message: "" }));
   }, []);
 
-  const deleteCookie = () => {
-    console.log("clearing cookie");
-    Cookies.remove("token");
-    console.log("cleared cookie");
-    console.log("get cookie", Cookies.get("token"));
-  };
+  // const deleteCookie = () => {
+  //   console.log("clearing cookie");
+  //   Cookies.remove("token");
+  //   console.log("cleared cookie");
+  //   console.log("get cookie", Cookies.get("token"));
+  // };
 
-  useEffect(() => {
-    deleteCookie();
-  }, [deleteCookie]);
+  // useEffect(() => {
+  //   deleteCookie();
+  // }, [deleteCookie]);
 
   const validateForm = () => {
     let isValid = true;
@@ -67,11 +65,12 @@ const Login = () => {
     try {
       if (validateForm()) {
         const user = { username, password };
-        const response = await dispatch(loginUserThunk(user)).unwrap(); // get obj
-        console.log("the response", response.message);
+        const response = await dispatch(loginUserThunk(user)).unwrap();
 
         // do not exist
         if (response.requestState === 1) {
+          dispatch(userActions.setLoggedUser({ user: response.user }));
+          dispatch(userActions.setAuthToken({ token: response.token }));
           dispatch(userActions.setLoginSuccess({ success: true }));
           dispatch(
             notificationDialogActions.setMessage({
@@ -96,48 +95,6 @@ const Login = () => {
       console.error(e);
     }
   };
-
-  // const fetchUser = async () => {
-  //   try {
-  //     if (validateForm()) {
-  //       const response = await dispatch(
-  //         fetchUserByUsernameThunk(username)
-  //       ).unwrap();
-  //       // dispatch(notificationDialogActions.setMessage({ message: "" }));
-
-  //       // do not exist
-  //       if (response.username == undefined) {
-  //         setUsernameError("user not found");
-  //         dispatch(userActions.setLoginSuccess({ success: false }));
-  //         // dispatch(notificationDialogActions.setMessage({message: "login failed !"}));
-  //       } else {
-  //         const passwordMatch = await bcrypt.compare(
-  //           password,
-  //           response.password
-  //         );
-  //         if (passwordMatch) {
-  //           dispatch(userActions.setUserData({ userData: response }));
-  //           dispatch(userActions.setLoginSuccess({ success: true }));
-  //           dispatch(
-  //             notificationDialogActions.setMessage({
-  //               message: "logged in sucessfully!",
-  //             })
-  //           );
-  //         } else {
-  //           setPasswordError("incorrect password");
-  //           dispatch(userActions.setLoginSuccess({ success: false }));
-  //           // dispatch(notificationDialogActions.setMessage({ message: "login failed !"}));
-  //         }
-  //       }
-  //     } else {
-  //       dispatch(userActions.setLoginSuccess({ success: false }));
-  //       // dispatch(notificationDialogActions.setMessage({ message: "login failed !" }));
-  //     }
-  //   } catch (e) {
-  //     // setError("Something is wrong.. Cannot connect to server.");
-  //     console.error(e);
-  //   }
-  // };
 
   const handleGoSignUpButton = () => {
     navigate("/signup");

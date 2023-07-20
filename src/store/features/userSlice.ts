@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { RootState } from "../store";
-import { createUserThunk, loginUserThunk } from "./userThunk"; // fetchUserByUsernameThunk
+import { createUserThunk, loginUserThunk, logoutThunk } from "./userThunk";
 
 export interface UserI {
     username: string;
@@ -9,22 +9,24 @@ export interface UserI {
   }
 
 interface UserState {
-    user: UserI,
+    loggedUser: UserI;
     isLoading: boolean;
     signup_success: boolean;
     login_success: boolean;
+    authToken: string;
 }
 
 const initialState: UserState = {
-    user: { username: "", password: "", departmentId: 1},
+    loggedUser: { username: "", password: "", departmentId: 1},
     isLoading: false,
     signup_success: false,
-    login_success: false
+    login_success: false,
+    authToken: ""
 }
 
-// const setUserData = (state: UserState, action: PayloadAction<{userData: UserI}>) => {
-//   state.user = action.payload.userData;
-// } 
+const setLoggedUser = (state: UserState, action: PayloadAction<{user: UserI}>) => {
+  state.loggedUser = action.payload.user;
+} 
 
 const setSignUpSuccess = (state: UserState, action: PayloadAction<{success:boolean}>) => {
   state.signup_success = action.payload.success;
@@ -34,27 +36,21 @@ const setLoginSuccess = (state: UserState, action: PayloadAction<{success:boolea
   state.login_success = action.payload.success;
 } 
 
+const setAuthToken = (state: UserState, action: PayloadAction<{token:string}>) => {
+  state.authToken = action.payload.token;
+} 
+
 export const userSlice = createSlice({
   name: 'user', 
   initialState,
   reducers: { 
-    // setUserData, 
+    setLoggedUser, 
     setSignUpSuccess,
-    setLoginSuccess
+    setLoginSuccess,
+    setAuthToken
   },
   extraReducers:(builders) => {
     builders 
-    // .addCase(fetchUserByUsernameThunk.pending, (state) => { 
-    //   state.isLoading = true;
-    // })
-    // .addCase(fetchUserByUsernameThunk.fulfilled, (state, action) => { 
-    //   state.user = action.payload;
-    //   state.isLoading = false;
-    // })
-    // .addCase(fetchUserByUsernameThunk.rejected, (state) => { 
-    //   state.user = initialState.user; 
-    //   state.isLoading = false;
-    // })
     .addCase(createUserThunk.pending, (state) => { 
       state.isLoading = true;
     })
@@ -62,7 +58,7 @@ export const userSlice = createSlice({
       state.isLoading = false;
     })
     .addCase(createUserThunk.rejected, (state) => { 
-      state.user = initialState.user; 
+      state.loggedUser = initialState.loggedUser; 
       state.isLoading = false;
     })
     .addCase(loginUserThunk.pending, (state) => { 
@@ -72,7 +68,17 @@ export const userSlice = createSlice({
       state.isLoading = false;
     })
     .addCase(loginUserThunk.rejected, (state) => { 
-      state.user = initialState.user; 
+      state.loggedUser = initialState.loggedUser; 
+      state.isLoading = false;
+    })
+    .addCase(logoutThunk.pending, (state) => { 
+      state.isLoading = true;
+    })
+    .addCase(logoutThunk.fulfilled, (state) => { 
+      state.isLoading = false;
+    })
+    .addCase(logoutThunk.rejected, (state) => { 
+      state.loggedUser = initialState.loggedUser; 
       state.isLoading = false;
     })
   }

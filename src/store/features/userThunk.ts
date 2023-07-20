@@ -47,3 +47,13 @@ export const loginUserThunk = createAsyncThunk(
         return e.response.data;
     }
 })
+
+export const logoutThunk = createAsyncThunk( 
+    "user/logoutUser", async(token: string) => {
+    try {
+        const response = await axios.post(url + "logout", token, {withCredentials: true}); 
+        return response.data;
+    } catch (e: any) {
+        return e.response.data;
+    }
+})

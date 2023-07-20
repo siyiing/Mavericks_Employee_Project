@@ -17,6 +17,8 @@ const NotifDialog = () => {
   const success = useAppSelector((state) => state.employeeform.success);
   const signupSuccess = useAppSelector((state) => state.user.signup_success);
   const loginSuccess = useAppSelector((state) => state.user.login_success);
+  const token = useAppSelector((state) => state.user.authToken);
+  console.log('ttt', token)
 
   const handleClose = () => {
     dispatch(notificationDialogActions.setOpen({ open: false }));
@@ -31,6 +33,10 @@ const NotifDialog = () => {
 
     if (location === "/login" && loginSuccess) {
       navigate("/employeelist");
+    }
+
+    if (!token) {
+      navigate("/login");
     }
   };
 
