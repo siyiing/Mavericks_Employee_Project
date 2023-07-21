@@ -17,6 +17,7 @@ import NotifDialog from "./NotifDialog";
 import { notificationDialogActions } from "../store/features/notificationDialogSlice";
 import { deleteDialogActions } from "../store/features/deleteDialogSlice";
 import { employeeFormActions } from "../store/features/employeeFormSlice";
+import { paginationAction } from "../store/features/paginationSlice";
 
 const EmployeeList = () => {
   const dispatch = useAppDispatch();
@@ -33,13 +34,13 @@ const EmployeeList = () => {
   const loggedUser = useAppSelector((state) => state.user.loggedUser);
 
   const handleFetchUserType = (response: any) => {
-    if (
-      Array.isArray(response) &&
-      response.length > 0 &&
-      typeof response[0] === "object"
-    )
-      return true;
-    else return false;
+    if (Array.isArray(response) &&response.length > 0 &&typeof response[0] === "object") {
+       return true;
+    }
+    else {
+       return false;
+    }
+   
   };
 
   const handleDeleteClickOpen = (emp: EmployeeI) => {
@@ -55,7 +56,7 @@ const EmployeeList = () => {
       ).unwrap();
       const result = handleFetchUserType(response);
 
-      if (!result) setError("No permission to access this page.");
+      if (!result) setError("No permission to access this page."); // no use
     } catch (e) {
       setError("Something is wrong.. Cannot connect to server.");
       console.error(e);

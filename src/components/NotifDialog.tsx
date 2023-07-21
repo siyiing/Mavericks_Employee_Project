@@ -22,20 +22,21 @@ const NotifDialog = () => {
   const handleClose = () => {
     dispatch(notificationDialogActions.setOpen({ open: false }));
 
-    if (
-      (location === "/addemployee" || location === "/editemployee") &&
-      success
-    )
-      navigate("/employeelist");
+    if (token) {
+      // have token
+      if (
+        (location === "/addemployee" || location === "/editemployee") &&
+        success
+      )
+        navigate("/employeelist");
 
-    if (location === "/signup" && signupSuccess) navigate("/login");
+      if (location === "/signup" && signupSuccess) navigate("/login");
 
-    if (location === "/login" && loginSuccess) {
-      navigate("/employeelist");
-    }
-
-    if (!token) {
-      navigate("/login");
+      if (location === "/login" && loginSuccess) navigate("/employeelist");
+    } else {
+      // no token
+      if (!loginSuccess && location !== "/login") navigate("/login");
+      if (message === "logout successfully") navigate("/login");
     }
   };
 

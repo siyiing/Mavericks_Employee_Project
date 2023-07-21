@@ -22,11 +22,11 @@ const LogOutBtn = () => {
     const response = await dispatch(logoutThunk(token)).unwrap();
 
     if (response.success === 1) {
-      dispatch(notificationDialogActions.setOpen({ open: true }));
       dispatch(userActions.setAuthToken({ token: "" }));
       dispatch(
         notificationDialogActions.setMessage({ message: "logout successfully" })
       );
+      dispatch(notificationDialogActions.setOpen({ open: true }));
     } else {
       dispatch(
         notificationDialogActions.setMessage({ message: "logout failed" })

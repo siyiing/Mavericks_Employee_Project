@@ -86,7 +86,6 @@ const Login = () => {
   };
 
   const handleGoSignUpButton = () => {
-    console.log('go sign up')
     navigate("/signup");
   };
 
@@ -170,7 +169,7 @@ const Login = () => {
                     textDecoration: "underline",
                   }}
                 >
-                  Not an existing user? sign up here
+                  Not an existing user? Sign up here
                 </Button>
               </Box>
             </Container>
