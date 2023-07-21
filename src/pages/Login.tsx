@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { userActions } from "../store/features/userSlice";
 import { notificationDialogActions } from "../store/features/notificationDialogSlice";
 import { useLocation, useNavigate } from "react-router-dom";
-// import Cookies from "js-cookie";
+import Cookies from "js-cookie";
 
 const Login = () => {
   const dispatch = useAppDispatch();
@@ -61,6 +61,8 @@ const Login = () => {
           dispatch(userActions.setLoggedUser({ user: response.user }));
           dispatch(userActions.setAuthToken({ token: response.token }));
           dispatch(userActions.setLoginSuccess({ success: true }));
+          dispatch(userActions.setCookie({ cookie: response.token }));
+          
           dispatch(
             notificationDialogActions.setMessage({
               message: "logged in sucessfully!",

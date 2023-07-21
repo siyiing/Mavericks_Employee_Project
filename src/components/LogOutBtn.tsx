@@ -10,7 +10,6 @@ import { notificationDialogActions } from "../store/features/notificationDialogS
 import NotifDialog from "./NotifDialog";
 
 const LogOutBtn = () => {
-  const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   const theme = useTheme();
@@ -31,6 +30,7 @@ const LogOutBtn = () => {
       dispatch(
         notificationDialogActions.setMessage({ message: "logout failed" })
       );
+      dispatch(userActions.setCookie({ cookie: "" }));
     }
   };
 

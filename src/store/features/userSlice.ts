@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { RootState } from "../store";
-import { createUserThunk, loginUserThunk, logoutThunk } from "./userThunk";
+import { createUserThunk, loginUserThunk, logoutThunk, getAuthThunk } from "./userThunk";
+import Cookies from "js-cookie";
 
 export interface UserI {
     username: string;
@@ -14,6 +15,7 @@ interface UserState {
     signup_success: boolean;
     login_success: boolean;
     authToken: string;
+    cookie: string;
 }
 
 const initialState: UserState = {
@@ -21,7 +23,8 @@ const initialState: UserState = {
     isLoading: false,
     signup_success: false,
     login_success: false,
-    authToken: ""
+    authToken: "",
+    cookie: Cookies.get("token") || ""
 }
 
 const setLoggedUser = (state: UserState, action: PayloadAction<{user: UserI}>) => {
@@ -40,6 +43,10 @@ const setAuthToken = (state: UserState, action: PayloadAction<{token:string}>) =
   state.authToken = action.payload.token;
 } 
 
+const setCookie = (state: UserState, action: PayloadAction<{cookie:string}>) => {
+  state.cookie = action.payload.cookie;
+} 
+
 export const userSlice = createSlice({
   name: 'user', 
   initialState,
@@ -47,7 +54,8 @@ export const userSlice = createSlice({
     setLoggedUser, 
     setSignUpSuccess,
     setLoginSuccess,
-    setAuthToken
+    setAuthToken,
+    setCookie
   },
   extraReducers:(builders) => {
     builders 
@@ -79,6 +87,15 @@ export const userSlice = createSlice({
     })
     .addCase(logoutThunk.rejected, (state) => { 
       state.loggedUser = initialState.loggedUser; 
+      state.isLoading = false;
+    })
+    .addCase(getAuthThunk.pending, (state) => { 
+      state.isLoading = true;
+    })
+    .addCase(getAuthThunk.fulfilled, (state) => { 
+      state.isLoading = false;
+    })
+    .addCase(getAuthThunk.rejected, (state) => { 
       state.isLoading = false;
     })
   }

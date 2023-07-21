@@ -15,7 +15,7 @@ import {
 import Item from "@mui/material/Grid";
 import { Department, EmployeeI } from "../store/features/employeeSlice";
 import classes from "../styles/form.module.css";
-import { useAppDispatch } from "../store/hook";
+import { useAppDispatch, useAppSelector } from "../store/hook";
 import {
   createEmployeeThunk,
   updateEmployeeThunk,
@@ -43,6 +43,7 @@ const AddEditEmployee = () => {
   const curEmp = editEmp;
 
   useEffect(() => {
+    dispatch(employeeFormActions.setSuccess({ success: false }));
     dispatch(
       notificationDialogActions.setLocation({ location: location.pathname })
     );
@@ -64,13 +65,13 @@ const AddEditEmployee = () => {
     }
   }, [location.pathname]);
 
-  const insertEmployee = async (employee: EmployeeI) => {
-    try {
-      await dispatch(createEmployeeThunk(employee)).unwrap();
-    } catch (e) {
-      console.error(e);
-    }
-  };
+  // const insertEmployee = async (employee: EmployeeI) => {
+  //   try {
+  //     return await dispatch(createEmployeeThunk(employee)).unwrap();
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // };
 
   const updateEmployee = async (employee: EmployeeI) => {
     try {
@@ -92,7 +93,11 @@ const AddEditEmployee = () => {
     if (/\d/.test(name)) {
       setNameError("name should not contain numeric values");
       isValid = false;
-    } else if (name.length < 4 || name.length > 30 || name.trim().length === 0) {
+    } else if (
+      name.length < 4 ||
+      name.length > 30 ||
+      name.trim().length === 0
+    ) {
       setNameError(
         "name should be at least 4 characters and not exceed 30 characters"
       );
@@ -131,17 +136,32 @@ const AddEditEmployee = () => {
     else if (modeTitle === "Update Employee Details") handleUpdateButton();
   };
 
-  const handleInsertButton = () => {
+  const handleInsertButton = async () => {
     setButtonClicked(true);
+
     if (validateForm()) {
       let edept: Department = Department[dept as keyof typeof Department]; // get department in form of enum value
       const emp = { name, department: edept, salary };
-      insertEmployee(emp);
-      dispatch(employeeFormActions.setSuccess({ success: true }));
-      dispatch(notificationDialogActions.setMessage({message: "insert sucessfully !",}));
+      const response = await dispatch(createEmployeeThunk(emp)).unwrap();
+      // insertEmployee(emp);
+
+      if (response === "OK") {
+        dispatch(employeeFormActions.setSuccess({ success: true }));
+        dispatch(
+          notificationDialogActions.setMessage({
+            message: "insert sucessfully !",
+          })
+        );
+      } else {
+        if (response === "Bad Request")
+          dispatch(employeeFormActions.setSuccess({ success: false }));
+        setNameError("name already exist");
+      }
     } else {
       dispatch(employeeFormActions.setSuccess({ success: false }));
-      dispatch(notificationDialogActions.setMessage({ message: "fail to insert." }));
+      dispatch(
+        notificationDialogActions.setMessage({ message: "fail to insert." })
+      );
     }
   };
 
@@ -157,15 +177,25 @@ const AddEditEmployee = () => {
         emp.salary === curEmp.salary
       ) {
         dispatch(employeeFormActions.setSuccess({ success: false }));
-        dispatch(notificationDialogActions.setMessage({message: "Update failed. No changes made."}));
+        dispatch(
+          notificationDialogActions.setMessage({
+            message: "Update failed. No changes made.",
+          })
+        );
       } else {
         updateEmployee(emp);
         dispatch(employeeFormActions.setSuccess({ success: true }));
-        dispatch(notificationDialogActions.setMessage({message: "updated successfully."}));
+        dispatch(
+          notificationDialogActions.setMessage({
+            message: "updated successfully.",
+          })
+        );
       }
     } else {
       dispatch(employeeFormActions.setSuccess({ success: false }));
-      dispatch(notificationDialogActions.setMessage({ message: "failed to update." }));
+      dispatch(
+        notificationDialogActions.setMessage({ message: "failed to update." })
+      );
     }
   };
 
@@ -277,7 +307,6 @@ const AddEditEmployee = () => {
 };
 
 export default AddEditEmployee;
-
 
 // //import { useState } from "react";
 // import {

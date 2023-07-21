@@ -18,6 +18,7 @@ const NotifDialog = () => {
   const signupSuccess = useAppSelector((state) => state.user.signup_success);
   const loginSuccess = useAppSelector((state) => state.user.login_success);
   const token = useAppSelector((state) => state.user.authToken);
+  const cookie = useAppSelector((state) => state.user.cookie);
 
   const handleClose = () => {
     dispatch(notificationDialogActions.setOpen({ open: false }));
@@ -33,10 +34,14 @@ const NotifDialog = () => {
       if (location === "/signup" && signupSuccess) navigate("/login");
 
       if (location === "/login" && loginSuccess) navigate("/employeelist");
+    } else if (!token && message === "logout successfully") {
+      navigate("/login");
+    } else if (cookie) {
+      dispatch(userActions.setAuthToken({ token: cookie }));
+      console.log("HELLO");
     } else {
       // no token
       if (!loginSuccess && location !== "/login") navigate("/login");
-      if (message === "logout successfully") navigate("/login");
     }
   };
 

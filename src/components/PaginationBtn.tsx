@@ -2,6 +2,8 @@ import { Box, Button } from "@mui/material";
 import { useAppSelector, useAppDispatch } from "../store/hook";
 import { paginationAction } from "../store/features/paginationSlice";
 import { useEffect } from "react";
+import { employeeFormActions } from "../store/features/employeeFormSlice";
+import { notificationDialogActions } from "../store/features/notificationDialogSlice";
 
 const PaginationBtn = () => {
   const dispatch = useAppDispatch();
@@ -10,6 +12,8 @@ const PaginationBtn = () => {
   const itemPerPage = useAppSelector((state) => state.pagination.itemPerPage);
   const preDisabled = useAppSelector((state) => state.pagination.preDisabled);
   const nextDisabled = useAppSelector((state) => state.pagination.nextDisabled);
+  const success = useAppSelector((state) => state.employeeform.success);
+  const message = useAppSelector((state) => state.notificationdialog.message);
 
   const checkItemCount = () => {
     if (totalItemCount <= 10) {
@@ -27,13 +31,22 @@ const PaginationBtn = () => {
 
   useEffect(() => {
     checkItemCount();
-  }, [curPage]); // depend on curPage to refresh when page change
+  }, [curPage, totalItemCount]); // depend on curPage to refresh when page change
 
   useEffect(() => {
     const totalPage = Math.ceil(totalItemCount / itemPerPage);
-    if (totalPage !== curPage)
+    if (totalPage !== 0 && totalPage < curPage)
       dispatch(paginationAction.setCurPage({ curPage: totalPage }));
-  }, [totalItemCount]); // depend on curPage to refresh when page change
+    else if (
+      success &&
+      totalPage != curPage &&
+      message === "insert sucessfully !"
+    ) {
+      dispatch(paginationAction.setCurPage({ curPage: totalPage }));
+      dispatch(employeeFormActions.setSuccess({ success: false }));
+      dispatch(notificationDialogActions.setMessage({ message: "" }));
+    }
+  }, [totalItemCount, success]); // depend on curPage to refresh when page change
 
   const handlePreviousPage = () => {
     dispatch(paginationAction.setCurPage({ curPage: curPage - 1 }));

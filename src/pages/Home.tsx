@@ -5,16 +5,9 @@ import NotFound from "../pages/NotFound";
 import Login from "./Login";
 import SignUp from "./SignUp";
 import { Routes, Route } from "react-router-dom";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+
 
 const Home = () => {
-  const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   navigate("/login");
-  // }, []);
-
   return (
     <div className="Home">
       <Header />

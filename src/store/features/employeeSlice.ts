@@ -23,10 +23,6 @@ const initialState: EmployeeState = {
   totalCount: 0
 }
 
-// const setEmpListData = (state: EmployeeState, action: PayloadAction<{empList: EmployeeI}>) => {
-//   state.totalCount = action.payload.totalCount;
-// } 
-
 const setTotalCount = (state: EmployeeState, action: PayloadAction<{totalCount: number}>) => {
   state.totalCount = action.payload.totalCount;
 } 

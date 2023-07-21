@@ -17,7 +17,8 @@ import NotifDialog from "./NotifDialog";
 import { notificationDialogActions } from "../store/features/notificationDialogSlice";
 import { deleteDialogActions } from "../store/features/deleteDialogSlice";
 import { employeeFormActions } from "../store/features/employeeFormSlice";
-import { paginationAction } from "../store/features/paginationSlice";
+import jwtDecode from "jwt-decode";
+import { getAuthThunk } from "../store/features/userThunk";
 
 const EmployeeList = () => {
   const dispatch = useAppDispatch();
@@ -30,17 +31,19 @@ const EmployeeList = () => {
   const fetchedEmployees = useAppSelector((state) => state.employee.employees);
   const curPage = useAppSelector((state) => state.pagination.curPage);
   const itemPerPage = useAppSelector((state) => state.pagination.itemPerPage);
-
   const loggedUser = useAppSelector((state) => state.user.loggedUser);
+  const cookie = useAppSelector((state) => state.user.cookie);
 
   const handleFetchUserType = (response: any) => {
-    if (Array.isArray(response) &&response.length > 0 &&typeof response[0] === "object") {
-       return true;
+    if (
+      Array.isArray(response) &&
+      response.length > 0 &&
+      typeof response[0] === "object"
+    ) {
+      return true;
+    } else {
+      return false;
     }
-    else {
-       return false;
-    }
-   
   };
 
   const handleDeleteClickOpen = (emp: EmployeeI) => {
@@ -51,9 +54,24 @@ const EmployeeList = () => {
   // THIS IS TO FETCH EMPLOYEE BY THE LOGGED IN DEPARTMENT ID
   const fetchEmployee = async () => {
     try {
-      const response = await dispatch(
-        fetchEmployeesByDeptIdThunk(loggedUser.departmentId)
-      ).unwrap();
+      let response: any;
+
+      if (cookie) {
+        const validAuth = await dispatch(getAuthThunk(cookie)).unwrap();
+        console.log('val', validAuth)
+        if (validAuth) {
+          let decodedToken: any = jwtDecode(cookie);
+          response = await dispatch(
+            fetchEmployeesByDeptIdThunk(decodedToken.departmentId)
+          ).unwrap();
+        } else {
+          setError("not authenticated");
+        }
+      } else {
+        response = await dispatch(
+          fetchEmployeesByDeptIdThunk(loggedUser.departmentId)
+        ).unwrap();
+      }
       const result = handleFetchUserType(response);
 
       if (!result) setError("No permission to access this page."); // no use
@@ -63,31 +81,18 @@ const EmployeeList = () => {
     }
   };
 
-  // THIS FETCH ALL WITHOUT FILTERING
-  // const fetchEmployee = async () => {
-  //   try {
-  //     const response = await dispatch(fetchAllEmployeesThunk()).unwrap(); // unwrap helps to tell me which status it is
-
-  //     if (response.requestState === 0)
-  //       setError("A token is required for authentication");
-  //   } catch (e) {
-  //     setError("Something is wrong.. Cannot connect to server.");
-  //     console.error(e);
-  //   }
-  // };
-
   useEffect(() => {
     fetchEmployee();
   }, []);
 
   useEffect(() => {
     dispatch(
-      notificationDialogActions.setLocation({ location: location.pathname })
-    );
-    dispatch(
       employeeAction.setTotalCount({ totalCount: fetchedEmployees.length })
     );
-    dispatch(employeeFormActions.setSuccess({ success: false }));
+    // dispatch(employeeFormActions.setSuccess({ success: false }));
+    dispatch(
+      notificationDialogActions.setLocation({ location: location.pathname })
+    );
 
     const result = handleFetchUserType(fetchedEmployees);
 
