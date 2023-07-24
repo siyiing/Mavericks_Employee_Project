@@ -7,7 +7,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useAppSelector, useAppDispatch } from "../store/hook";
 import { Box, Grid } from "@mui/material";
 import Item from "@mui/material/Grid";
-import { fetchEmployeesByDeptIdThunk } from "../store/features/employeeThunk"; // fetchAllEmployeesThunk
+import { fetchEmployeesByDeptIdThunk } from "../store/features/employeeThunk";
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import DeleteDialog from "./DeleteDialog";
@@ -19,6 +19,7 @@ import { deleteDialogActions } from "../store/features/deleteDialogSlice";
 import { employeeFormActions } from "../store/features/employeeFormSlice";
 import jwtDecode from "jwt-decode";
 import { getAuthThunk } from "../store/features/userThunk";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const EmployeeList = () => {
   const dispatch = useAppDispatch();
@@ -33,11 +34,11 @@ const EmployeeList = () => {
   const itemPerPage = useAppSelector((state) => state.pagination.itemPerPage);
   const loggedUser = useAppSelector((state) => state.user.loggedUser);
   const cookie = useAppSelector((state) => state.user.cookie);
+  const isLoading = useAppSelector((state) => state.employee.isLoading);
 
   const handleFetchUserType = (response: any) => {
     if (
-      Array.isArray(response) &&
-      response.length > 0 &&
+      (Array.isArray(response) && response.length > 0) ||
       typeof response[0] === "object"
     ) {
       return true;
@@ -58,19 +59,15 @@ const EmployeeList = () => {
 
       if (cookie) {
         const validAuth = await dispatch(getAuthThunk(cookie)).unwrap();
-        console.log('val', validAuth)
+
         if (validAuth) {
           let decodedToken: any = jwtDecode(cookie);
-          response = await dispatch(
-            fetchEmployeesByDeptIdThunk(decodedToken.departmentId)
-          ).unwrap();
+          response = await dispatch(fetchEmployeesByDeptIdThunk(decodedToken.departmentId)).unwrap();
         } else {
           setError("not authenticated");
         }
       } else {
-        response = await dispatch(
-          fetchEmployeesByDeptIdThunk(loggedUser.departmentId)
-        ).unwrap();
+        response = await dispatch(fetchEmployeesByDeptIdThunk(loggedUser.departmentId)).unwrap();
       }
       const result = handleFetchUserType(response);
 
@@ -86,13 +83,8 @@ const EmployeeList = () => {
   }, []);
 
   useEffect(() => {
-    dispatch(
-      employeeAction.setTotalCount({ totalCount: fetchedEmployees.length })
-    );
-    // dispatch(employeeFormActions.setSuccess({ success: false }));
-    dispatch(
-      notificationDialogActions.setLocation({ location: location.pathname })
-    );
+    dispatch(employeeAction.setTotalCount({ totalCount: fetchedEmployees.length }));
+    dispatch(notificationDialogActions.setLocation({ location: location.pathname }));
 
     const result = handleFetchUserType(fetchedEmployees);
 
@@ -117,11 +109,13 @@ const EmployeeList = () => {
           justifyContent: "center",
         }}
       >
-        {error ? (
+        {isLoading ? (
+          <CircularProgress />
+        ) : error ? (
           <Typography color="error" variant="h6" sx={{ textAlign: "center" }}>
             {error}
           </Typography>
-        ) : fetchedEmployees.length === 0 ? (
+        ) : isLoading && fetchedEmployees.length === 0 ? (
           <Typography color="error" variant="h6" sx={{ textAlign: "center" }}>
             {"No Existing Employee"}
           </Typography>

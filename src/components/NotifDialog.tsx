@@ -38,7 +38,6 @@ const NotifDialog = () => {
       navigate("/login");
     } else if (cookie) {
       dispatch(userActions.setAuthToken({ token: cookie }));
-      console.log("HELLO");
     } else {
       // no token
       if (!loginSuccess && location !== "/login") navigate("/login");
