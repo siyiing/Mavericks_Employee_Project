@@ -8,11 +8,12 @@ import { Routes, Route } from "react-router-dom";
 
 
 const Home = () => {
+
   return (
     <div className="Home">
       <Header />
       <Routes>
-        <Route path="/employeelist" element={<EmployeeList />} />
+        <Route path="/" element={<EmployeeList />} />
         <Route path="/addEmployee" element={<AddEditEmployee />} />
         <Route path="/editEmployee" element={<AddEditEmployee />} />
         <Route path="*" element={<NotFound />} />

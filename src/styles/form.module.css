@@ -1,11 +1,17 @@
 .main_grid {
-    border: 1px solid red;
     margin: auto;   
-    width: 100vw;
+    width: 100%;
 }
 
 .addTitle {
      font-weight: bold;
      font-size: 3rem;
      text-align: center;
+}
+
+.notfound {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

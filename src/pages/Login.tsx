@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 import { userActions } from "../store/features/userSlice";
 import { notificationDialogActions } from "../store/features/notificationDialogSlice";
 import { useLocation, useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
 
 const Login = () => {
   const dispatch = useAppDispatch();

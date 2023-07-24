@@ -16,7 +16,7 @@ const BackBtn = () => {
       location.pathname === "/addemployee" ||
       location.pathname === "/editemployee"
     )
-      navigate("/employeelist");
+      navigate("/");
 
     if (location.pathname === "/signup") navigate("/login");
   };

@@ -29,18 +29,22 @@ const NotifDialog = () => {
         (location === "/addemployee" || location === "/editemployee") &&
         success
       )
-        navigate("/employeelist");
+        navigate("/");
 
       if (location === "/signup" && signupSuccess) navigate("/login");
 
-      if (location === "/login" && loginSuccess) navigate("/employeelist");
+      if (location === "/login" && loginSuccess) navigate("/");
     } else if (!token && message === "logout successfully") {
       navigate("/login");
     } else if (cookie) {
       dispatch(userActions.setAuthToken({ token: cookie }));
     } else {
       // no token
-      if (!loginSuccess && location !== "/login") navigate("/login");
+      if (!loginSuccess && location !== "/login") {
+        navigate("/login");
+
+        if (location === "/signup") navigate("/signup");
+      }
     }
   };
 
